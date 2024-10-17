@@ -1,0 +1,186 @@
+:root {
+  --primary-color: #164951;
+  --text-color: #2D5B62;
+  /*--background-color: #FDFCF8;*/
+  --border-color: #164951;
+  --placeholder-color: #6B7280;
+  --error-color: #dc3545;
+  --disabled-color: #ccc;
+  --deactivated-button-color: #8B9FA2; /* New color for deactivated buttons */
+}
+
+body {
+  font-family: 'Univers LT Std', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  padding:1em;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+h2, .title {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 130%;
+  letter-spacing: 0.2px;
+  color: var(--text-color);
+  text-align: center;
+}
+
+p {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.2px;
+  color: var(--placeholder-color);
+  text-align: center;
+}
+
+input, textarea {
+  width: calc(100% - 32px);
+  padding: 8px 16px;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 16px;
+  color: var(--text-color);
+  margin-bottom:16px;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--placeholder-color);
+}
+
+textarea {
+  height: 200px;
+  resize: none;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.primary-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 8px;
+  width: 327px;
+  height: 56px;
+  background-color: var(--primary-color);
+  border-radius: 12px;
+  font-family: 'Univers LT Std', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  text-align: center;
+  letter-spacing: 0.2px;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-button:disabled {
+  background-color: var(--deactivated-button-color); /* Changed to use the new deactivated button color */
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+}
+
+/* Specific styles for the welcome screen */
+.welcome-screen {
+  position: relative;
+  height: 844px;
+}
+
+.welcome-screen .image-container {
+  position: absolute;
+  width: 564px;
+  height: 423px;
+  left: -87px;
+  top: 90px;
+}
+
+.welcome-screen .image-container img {
+  width: 447px;
+  height: 335.25px;
+  position: absolute;
+  left: 59px;
+  top: 26px;
+}
+
+.welcome-screen .text-container {
+  position: absolute;
+  width: 327px;
+  left: 32px;
+  top: 422px;
+}
+
+.welcome-screen .primary-button {
+  position: absolute;
+  left: 32px;
+  top: 669px;
+}
+
+/* Dark mode styles */
+.dark-theme {
+  --text-color: #ECF0F1;
+  --background-color: #2C3E50;
+  --border-color: #34495E;
+  --placeholder-color: #95A5A6;
+  --error-color: #E74C3C;
+  --disabled-color: #34495E;
+  --deactivated-button-color: #5D6D7E; /* Darker shade for deactivated buttons in dark mode */
+}
+
+.dark-theme #app {
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+/* New rule to ensure all backgrounds are dark in dark mode */
+.dark-theme * {
+  background-color: var(--background-color);
+}
+
+/* Preserve the background color of inputs and textareas */
+.dark-theme input,
+.dark-theme textarea {
+  background-color: var(--background-color);
+}
+
+/* Preserve the background color of the primary button */
+.dark-theme .primary-button {
+  background-color: var(--primary-color);
+}
+
+/* Ensure deactivated buttons use the correct color in dark mode */
+.dark-theme .primary-button:disabled {
+  background-color: var(--deactivated-button-color);
+}
