@@ -16,6 +16,7 @@
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { createPinia } from 'pinia'
 
 export default defineComponent({
   name: 'Welcome',
@@ -25,13 +26,21 @@ export default defineComponent({
 
     const handleGetStarted = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      tg.HapticFeedback.impactOccurred('medium')
+      try {
+        tg.HapticFeedback?.impactOccurred?.('medium')
+      } catch (e) {
+        console.log('HapticFeedback not available')
+      }
       router.push('/name')
     }
 
     onMounted(() => {
-      tg.ready()
-      tg.expand()
+      try {
+        tg.ready?.()
+        tg.expand?.()
+      } catch (e) {
+        console.log('Telegram WebApp not fully available')
+      }
     })
 
     return { handleGetStarted }
