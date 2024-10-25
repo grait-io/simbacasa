@@ -1,12 +1,12 @@
 :root {
   --primary-color: #164951;
   --text-color: #2D5B62;
-  /*--background-color: #FDFCF8;*/
+  --background-color: #FDFCF8;
   --border-color: #164951;
   --placeholder-color: #6B7280;
   --error-color: #dc3545;
   --disabled-color: #ccc;
-  --deactivated-button-color: #8B9FA2; /* New color for deactivated buttons */
+  --deactivated-button-color: #8B9FA2;
 }
 
 body {
@@ -15,31 +15,36 @@ body {
 }
 
 #app {
-  /*padding:1em;*/
   color: var(--text-color);
   background-color: var(--background-color);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  padding: 20px;
 }
 
 .content-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 375px;
+  gap: 24px;
+  padding: 20px;
 }
 
 h2, .title {
   font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
+  font-weight: 500;
+  font-size: 24px;
   line-height: 130%;
   letter-spacing: 0.2px;
   color: var(--text-color);
   text-align: center;
+  margin: 0;
 }
 
 p {
@@ -50,16 +55,19 @@ p {
   letter-spacing: 0.2px;
   color: var(--placeholder-color);
   text-align: center;
+  margin: 8px 0 24px 0;
 }
 
 input, textarea {
-  width: calc(100% - 32px);
+  width: 100%;
   background: var(--background-color);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 16px;
   color: var(--text-color);
-  margin-bottom:16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
 input::placeholder, textarea::placeholder {
@@ -67,13 +75,15 @@ input::placeholder, textarea::placeholder {
 }
 
 textarea {
-  height: 200px;
+  height: 120px;
   resize: none;
 }
 
 .button-container {
   display: flex;
   justify-content: center;
+  width: 100%;
+  margin-top: 24px;
 }
 
 .primary-button {
@@ -82,13 +92,13 @@ textarea {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  width: 327px;
+  width: 100%;
   height: 56px;
   background-color: var(--primary-color);
   border-radius: 12px;
   font-family: 'Univers LT Std', sans-serif;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 16px;
   line-height: 150%;
   text-align: center;
@@ -96,86 +106,113 @@ textarea {
   color: #FFFFFF;
   border: none;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .primary-button:disabled {
-  background-color: var(--deactivated-button-color); /* Changed to use the new deactivated button color */
+  background-color: var(--deactivated-button-color);
   cursor: not-allowed;
 }
 
 .error-message {
   color: var(--error-color);
   font-size: 14px;
+  margin-top: 8px;
 }
 
-/* Specific styles for the welcome screen */
-.welcome-screen {
-  position: relative;
-  height: 844px;
+/* Navigation header */
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-.welcome-screen .image-container {
-  position: absolute;
-  width: 564px;
-  height: 423px;
-  left: -87px;
-  top: 90px;
+.nav-header button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 16px;
+  cursor: pointer;
 }
 
-.welcome-screen .image-container img {
-  width: 447px;
-  height: 335.25px;
-  position: absolute;
-  left: 59px;
-  top: 26px;
+/* Logo styling */
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
 }
 
-.welcome-screen .text-container {
-  position: absolute;
-  width: 327px;
-  left: 32px;
-  top: 422px;
+.logo-container img {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
 }
 
-.welcome-screen .primary-button {
-  position: absolute;
-  left: 32px;
-  top: 669px;
+/* Social links styling */
+.social-link {
+  display: flex;
+  align-items: center;
+  background: var(--background-color);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--text-color);
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+}
+
+.social-link img {
+  margin-right: 12px;
+}
+
+/* Success screen styling */
+.success-screen {
+  text-align: center;
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 24px;
 }
 
 /* Dark mode styles */
 .dark-theme {
-  --text-color: #ECF0F1;
-  --background-color: #111827;
-  --border-color: #34495E;
-  --placeholder-color: #95A5A6;
+  --primary-color: #26515B;
+  --text-color: #FFFFFF;
+  --background-color: #0D1520;
+  --border-color: transparent;
+  --placeholder-color: rgba(255, 255, 255, 0.6);
   --error-color: #E74C3C;
-  --disabled-color: #34495E;
-  --deactivated-button-color: #5D6D7E; /* Darker shade for deactivated buttons in dark mode */
+  --disabled-color: rgba(255, 255, 255, 0.3);
+  --deactivated-button-color: rgba(38, 81, 91, 0.5);
 }
 
 .dark-theme #app {
-  color: var(--text-color);
   background-color: var(--background-color);
 }
 
-/* New rule to ensure all backgrounds are dark in dark mode */
-.dark-theme * {
-  background-color: var(--background-color);
-}
-
-/* Preserve the background color of inputs and textareas */
 .dark-theme input,
 .dark-theme textarea {
-  background-color: var(--background-color);
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
 }
 
-/* Preserve the background color of the primary button */
+.dark-theme .social-link {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+}
+
 .dark-theme .primary-button {
   background-color: var(--primary-color);
 }
 
-/* Ensure deactivated buttons use the correct color in dark mode */
 .dark-theme .primary-button:disabled {
   background-color: var(--deactivated-button-color);
 }
