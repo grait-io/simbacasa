@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from './store/user'
 import './style.css'  // Import the centralized styles
@@ -14,10 +14,13 @@ export default defineComponent({
   name: 'App',
   setup() {
     const isDarkTheme = ref(false)
-    const userStore = useUserStore()
-    const { telegramUsername } = storeToRefs(userStore)
+    let userStore: ReturnType<typeof useUserStore> | null = null
+    const telegramUsername = ref('')
 
     onMounted(() => {
+      // Initialize store after component is mounted
+      userStore = useUserStore()
+      
       // Ensure Telegram WebApp is available
       if (window.Telegram?.WebApp) {
         const tg = window.Telegram.WebApp
@@ -36,9 +39,11 @@ export default defineComponent({
           isDarkTheme.value = tg.colorScheme === 'dark'
         })
 
-        // Set Telegram username
-        userStore.setTelegramUsername()
-        console.log('Telegram username after setting:', telegramUsername.value)
+        // Set Telegram username only if store is initialized
+        if (userStore) {
+          userStore.setTelegramUsername()
+          telegramUsername.value = userStore.telegramUsername
+        }
       } else {
         console.log('Telegram WebApp not available')
       }
