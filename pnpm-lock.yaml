@@ -17,6 +17,9 @@ importers:
       vue-router:
         specifier: ^4.4.5
         version: 4.4.5(vue@3.5.11(typescript@5.6.3))
+      vue-tg:
+        specifier: ^0.8.0
+        version: 0.8.0(vue@3.5.11(typescript@5.6.3))
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^5.1.2
@@ -274,6 +277,9 @@ packages:
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
+  '@types/telegram-web-app@7.10.1':
+    resolution: {integrity: sha512-GKL659G6lnHRAt3Dt7L1Fa0dwvc+ZZQtJcYrJVJGwjvsbi/Rcp1qKs9pFwb34/KC04+J+TlQj4D7yKo10sBSEw==}
+
   '@vitejs/plugin-vue@5.1.4':
     resolution: {integrity: sha512-N2XSI2n3sQqp5w7Y/AN/L2XDjBIRGqXko+eDp42sydYSBeJuSm5a1sLf8zakmo8u7tA8NmBgoDLA1HeOESjp9A==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -479,6 +485,11 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
+  vue-tg@0.8.0:
+    resolution: {integrity: sha512-0DwRLrxtoOn7iCuEx0+GDHy5vSJPgbqJrEpE8QgRTJbLFI6ogP9jzG58pS8gXbntb3rqqWepxGwUJMn95MqP1g==}
+    peerDependencies:
+      vue: ^3
+
   vue-tsc@2.1.6:
     resolution: {integrity: sha512-f98dyZp5FOukcYmbFpuSCJ4Z0vHSOSmxGttZJCsFeX0M4w/Rsq0s4uKXjcSRsZqsRgQa6z7SfuO+y0HVICE57Q==}
     hasBin: true
@@ -629,6 +640,8 @@ snapshots:
     optional: true
 
   '@types/estree@1.0.6': {}
+
+  '@types/telegram-web-app@7.10.1': {}
 
   '@vitejs/plugin-vue@5.1.4(vite@5.4.8)(vue@3.5.11(typescript@5.6.3))':
     dependencies:
@@ -845,6 +858,11 @@ snapshots:
   vue-router@4.4.5(vue@3.5.11(typescript@5.6.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
+      vue: 3.5.11(typescript@5.6.3)
+
+  vue-tg@0.8.0(vue@3.5.11(typescript@5.6.3)):
+    dependencies:
+      '@types/telegram-web-app': 7.10.1
       vue: 3.5.11(typescript@5.6.3)
 
   vue-tsc@2.1.6(typescript@5.6.3):

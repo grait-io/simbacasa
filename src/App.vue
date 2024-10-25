@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="{ 'light-theme': !isDarkTheme, 'dark-theme': isDarkTheme }">
+  <div id="app" :class="{ 'dark-theme': isDarkTheme }">
     <router-view></router-view>
   </div>
 </template>
@@ -18,25 +18,30 @@ export default defineComponent({
     const { telegramUsername } = storeToRefs(userStore)
 
     onMounted(() => {
-      const tg = (window as any).Telegram.WebApp
-      
-      // Set the header color
-      tg.setHeaderColor(tg.headerColor)
+      // Ensure Telegram WebApp is available
+      if (window.Telegram?.WebApp) {
+        const tg = window.Telegram.WebApp
+        
+        // Set the header color
+        tg.setHeaderColor?.(tg.headerColor)
 
-      // Set the background color
-      tg.setBackgroundColor(tg.backgroundColor)
+        // Set the background color
+        tg.setBackgroundColor?.(tg.backgroundColor)
 
-      // Check if dark theme is enabled
-      isDarkTheme.value = tg.colorScheme === 'dark'
-
-      // Listen for theme changes
-      tg.onEvent('themeChanged', () => {
+        // Check if dark theme is enabled
         isDarkTheme.value = tg.colorScheme === 'dark'
-      })
 
-      // Set Telegram username
-      userStore.setTelegramUsername()
-      console.log('Telegram username after setting:', telegramUsername.value)
+        // Listen for theme changes
+        tg.onEvent?.('themeChanged', () => {
+          isDarkTheme.value = tg.colorScheme === 'dark'
+        })
+
+        // Set Telegram username
+        userStore.setTelegramUsername()
+        console.log('Telegram username after setting:', telegramUsername.value)
+      } else {
+        console.log('Telegram WebApp not available')
+      }
     })
 
     return {
@@ -48,8 +53,6 @@ export default defineComponent({
 </script>
 
 <style>
-
-
 .logo {
   width: 100px;
   height: 100px;

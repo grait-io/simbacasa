@@ -22,12 +22,15 @@ const router = createRouter({
   ]
 })
 
+// Create Pinia instance first
 const pinia = createPinia()
 
+// Create app instance
 const app = createApp(App)
 
-app.use(router)
-app.use(pinia)
+// Install plugins in correct order
+app.use(pinia)  // Install Pinia first
+app.use(router) // Then install router
 
 // Make Telegram WebApp instance available in all components
 app.config.globalProperties.$tg = tg
