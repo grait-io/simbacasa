@@ -37,7 +37,8 @@ export default defineComponent({
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (!target.closest('textarea')) {
-        document.activeElement?.blur()
+        const activeElement = document.activeElement as HTMLElement
+        activeElement?.blur?.()
       }
     }
 
