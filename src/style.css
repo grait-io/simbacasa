@@ -12,29 +12,30 @@
 body {
   font-family: 'Univers LT Std', sans-serif;
   margin: 0;
-  background-color: var(--background-color);
 }
 
 #app {
   color: var(--text-color);
-  background-color: var(--background-color);
+  background-color: #FDFCF8;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   min-height: 100vh;
   padding: 20px;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .content-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   width: 100%;
   max-width: 375px;
-  gap: 24px;
+  flex: 1;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 h2, .title {
@@ -81,10 +82,16 @@ textarea {
 }
 
 .button-container {
+  width: 100%;
+  padding: 16px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: inherit;
   display: flex;
   justify-content: center;
-  width: 100%;
-  margin-top: 24px;
+  box-sizing: border-box;
 }
 
 .primary-button {
@@ -94,6 +101,7 @@ textarea {
   align-items: center;
   gap: 8px;
   width: 100%;
+  max-width: 375px;
   height: 56px;
   background-color: var(--primary-color);
   border-radius: 12px;
@@ -108,6 +116,7 @@ textarea {
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  margin-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .primary-button:disabled {
@@ -184,7 +193,7 @@ textarea {
 }
 
 /* Dark mode styles */
-:root.dark-theme {
+.dark-theme {
   --primary-color: #26515B;
   --text-color: #FFFFFF;
   --background-color: #0D1520;
@@ -195,13 +204,19 @@ textarea {
   --deactivated-button-color: rgba(38, 81, 91, 0.5);
 }
 
+.dark-theme #app {
+  background-color: #0D1520;
+}
+
 .dark-theme input,
 .dark-theme textarea {
   background: rgba(13, 21, 32, 0.8);
+  border: 1px solid var(--border-color);
 }
 
 .dark-theme .social-link {
   background: rgba(13, 21, 32, 0.8);
+  border: 1px solid var(--border-color);
 }
 
 .dark-theme .primary-button {
