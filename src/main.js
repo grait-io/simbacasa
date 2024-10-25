@@ -8,6 +8,7 @@ import Socials from './components/Socials.vue';
 import AboutYou from './components/AboutYou.vue';
 import Referrals from './components/Referrals.vue';
 import Confirmation from './components/Confirmation.vue';
+import tg from './telegram';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -19,6 +20,15 @@ const router = createRouter({
         { path: '/confirmation', component: Confirmation },
     ]
 });
+// Create Pinia instance first
 const pinia = createPinia();
-createApp(App).use(router).use(pinia).mount('#app');
+// Create app instance
+const app = createApp(App);
+// Install plugins in correct order
+app.use(pinia); // Install Pinia first
+app.use(router); // Then install router
+// Make Telegram WebApp instance available in all components
+app.config.globalProperties.$tg = tg;
+// Mount the app
+app.mount('#app');
 //# sourceMappingURL=main.js.map

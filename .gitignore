@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+src/*.vue.js.map
+echo "##active_line2##"
+src/*.js.map
+echo "##active_line3##"
+src/*.vue.js
+echo "##active_line4##"
+src/telegram.js.map
+echo "##active_line5##"
+src/telegram.js

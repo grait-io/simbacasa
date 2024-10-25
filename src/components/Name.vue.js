@@ -1,4 +1,4 @@
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../store/user';
 export default defineComponent({
@@ -6,13 +6,36 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const userStore = useUserStore();
+        const tg = window.Telegram.WebApp;
         const firstName = ref('');
         const lastName = ref('');
+        const lastNameInput = ref(null);
+        const isFormValid = computed(() => firstName.value.trim() && lastName.value.trim());
         const handleSubmit = () => {
-            userStore.updateUserData({ firstName: firstName.value, lastName: lastName.value });
-            router.push('/socials');
+            if (isFormValid.value) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                userStore.updateUserData({ firstName: firstName.value, lastName: lastName.value });
+                tg.HapticFeedback.impactOccurred('medium');
+                router.push('/socials');
+            }
         };
-        return { firstName, lastName, handleSubmit };
+        const focusLastName = () => {
+            if (lastNameInput.value) {
+                lastNameInput.value.focus();
+            }
+        };
+        const handleOutsideClick = (event) => {
+            const target = event.target;
+            if (!target.closest('input')) {
+                const activeElement = document.activeElement;
+                activeElement?.blur?.();
+            }
+        };
+        onMounted(() => {
+            tg.ready();
+            tg.expand();
+        });
+        return { firstName, lastName, handleSubmit, isFormValid, lastNameInput, focusLastName, handleOutsideClick };
     }
 });
 function __VLS_template() {
@@ -29,18 +52,29 @@ function __VLS_template() {
     };
     let __VLS_directives;
     let __VLS_styleScopedClasses;
+    // CSS variable injection 
+    // CSS variable injection end 
     let __VLS_resolvedLocalAndGlobalComponents;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ onClick: (__VLS_ctx.handleOutsideClick) }, ...{ class: ("content-wrapper") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("name") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.h2, __VLS_intrinsicElements.h2)({});
-    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({});
-    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ value: ((__VLS_ctx.firstName)), type: ("text"), placeholder: ("First Name"), });
-    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ value: ((__VLS_ctx.lastName)), type: ("text"), placeholder: ("Last Name"), });
-    __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleSubmit) }, ...{ class: ("primary-button") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("title") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.focusLastName) }, value: ((__VLS_ctx.firstName)), type: ("text"), placeholder: ("First Name"), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.handleSubmit) }, value: ((__VLS_ctx.lastName)), type: ("text"), placeholder: ("Last Name"), ref: ("lastNameInput"), });
+    // @ts-ignore navigation for `const lastNameInput = ref()`
+    __VLS_ctx.lastNameInput;
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("button-container") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleSubmit) }, ...{ class: ("primary-button") }, disabled: ((!__VLS_ctx.isFormValid)), });
+    __VLS_styleScopedClasses['content-wrapper'];
     __VLS_styleScopedClasses['name'];
+    __VLS_styleScopedClasses['title'];
+    __VLS_styleScopedClasses['button-container'];
     __VLS_styleScopedClasses['primary-button'];
     var __VLS_slots;
     var __VLS_inheritedAttrs;
-    const __VLS_refs = {};
+    const __VLS_refs = {
+        "lastNameInput": __VLS_nativeElements['input'],
+    };
     var $refs;
     return {
         slots: __VLS_slots,
