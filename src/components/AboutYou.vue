@@ -5,11 +5,11 @@
       <p class="title">Share a little about yourself</p>
       <p>Write up to 200 words to let us and other users understand who you are.</p>
       <textarea v-model="about" placeholder="About you" maxlength="200" ref="aboutTextarea"></textarea>
-      <div class="button-container">
-        <button @click="handleSubmit" class="primary-button">
-          Continue
-        </button>
-      </div>
+    </div>
+    <div class="button-container">
+      <button @click="handleSubmit" class="primary-button">
+        Continue
+      </button>
     </div>
   </div>
 </template>
@@ -45,8 +45,9 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style>
 .about-you {
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;

@@ -12,7 +12,6 @@
         {{ isSubmitting ? 'Submitting...' : 'Continue' }}
       </button>
     </div>
-    <div class="spacer"></div>
   </div>
 </template>
 
@@ -111,17 +110,11 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style>
 .referrals {
-  flex: 1;
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  padding: 16px;
   gap: 16px;
-}
-
-.spacer {
-  flex: 10;
 }
 </style>

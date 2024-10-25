@@ -52,10 +52,6 @@ body {
   position: relative;
 }
 
-.socials {
-  padding-top: 20px;
-}
-
 h2, .title {
   font-style: normal;
   font-weight: 500;
@@ -166,50 +162,6 @@ textarea {
   cursor: pointer;
 }
 
-/* Logo styling */
-.logo-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.logo-container img {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 24px;
-}
-
-/* Social links styling */
-.social-link {
-  display: flex;
-  align-items: center;
-  background: var(--background-color);
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  width: 100%;
-  box-sizing: border-box;
-  color: var(--text-color);
-  text-decoration: none;
-  border: 1px solid var(--border-color);
-}
-
-.social-link img {
-  margin-right: 12px;
-}
-
-/* Success screen styling */
-.success-screen {
-  text-align: center;
-}
-
-.success-icon {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 24px;
-}
-
 /* Dark mode styles */
 .dark-theme {
   --primary-color: #26515B;
@@ -224,11 +176,6 @@ textarea {
 
 .dark-theme input,
 .dark-theme textarea {
-  background: rgba(13, 21, 32, 0.8);
-  border: 1px solid var(--border-color);
-}
-
-.dark-theme .social-link {
   background: rgba(13, 21, 32, 0.8);
   border: 1px solid var(--border-color);
 }

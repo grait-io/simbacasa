@@ -1,15 +1,15 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
     <div class="name">
-      <h2>Name</h2>
-      <p>Add your name so others can connect with you.</p>
+      <h2>Your details</h2>
+      <p class="title">Find, offer and swap homes with a trusted community</p>
       <input v-model="firstName" type="text" placeholder="First Name" @keydown.enter="focusLastName">
       <input v-model="lastName" type="text" placeholder="Last Name" ref="lastNameInput" @keydown.enter="handleSubmit">
-      <div class="button-container">
-        <button @click="handleSubmit" class="primary-button" :disabled="!isFormValid">
-          Continue
-        </button>
-      </div>
+    </div>
+    <div class="button-container">
+      <button @click="handleSubmit" class="primary-button" :disabled="!isFormValid">
+        Continue
+      </button>
     </div>
   </div>
 </template>
@@ -63,8 +63,9 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style>
 .name {
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
