@@ -16,7 +16,7 @@ body {
 }
 
 #app {
-  padding:1em;
+  /*padding:1em;*/
   color: var(--text-color);
   background-color: var(--background-color);
   display: flex;
@@ -151,7 +151,7 @@ textarea {
 /* Dark mode styles */
 .dark-theme {
   --text-color: #ECF0F1;
-  --background-color: #2C3E50;
+  --background-color: #111827;
   --border-color: #34495E;
   --placeholder-color: #95A5A6;
   --error-color: #E74C3C;
