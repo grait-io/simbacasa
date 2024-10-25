@@ -38,7 +38,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style>
 .welcome {
   display: flex;
   flex-direction: column;
@@ -48,6 +48,7 @@ export default defineComponent({
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  background-color: var(--background-color);
 }
 
 .content {
@@ -73,12 +74,12 @@ export default defineComponent({
 }
 
 h1 {
-  color: #2D5B62;
+  color: var(--text-color);
   margin-bottom: 8px;
 }
 
 p {
-  color: #6B7280;
+  color: var(--placeholder-color);
   margin-bottom: 24px;
 }
 </style>
