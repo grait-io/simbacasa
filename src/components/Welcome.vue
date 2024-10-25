@@ -72,7 +72,7 @@ p {
   margin-bottom: 24px;
 }
 
-.primary-button {
+/*.primary-button {
   width: 100%;
   max-width: 300px;
   padding: 12px 16px;
@@ -82,5 +82,5 @@ p {
   border-radius: 12px;
   font-size: 16px;
   cursor: pointer;
-}
+}*/
 </style>
