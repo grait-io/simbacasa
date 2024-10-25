@@ -34,6 +34,7 @@ export default defineComponent({
 
     const handleSubmit = () => {
       if (isFormValid.value) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         userStore.updateUserData({ firstName: firstName.value, lastName: lastName.value })
         tg.HapticFeedback.impactOccurred('medium')
         router.push('/socials')

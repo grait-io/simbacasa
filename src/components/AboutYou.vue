@@ -29,6 +29,7 @@ export default defineComponent({
     const aboutTextarea = ref<HTMLTextAreaElement | null>(null)
 
     const handleSubmit = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       userStore.updateUserData({ about: about.value })
       router.push('/referrals')
     }

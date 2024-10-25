@@ -39,6 +39,7 @@ export default defineComponent({
     const handleSubmit = async () => {
       error.value = ''
       isSubmitting.value = true
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       userStore.updateUserData({ referralSource: referralSource.value })
       
       try {

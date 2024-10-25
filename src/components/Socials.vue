@@ -36,6 +36,7 @@ export default defineComponent({
 
     const handleSubmit = () => {
       if (isFormValid.value) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         userStore.updateUserData({ instagram: instagram.value, linkedin: linkedin.value })
         router.push('/about-you')
       }
@@ -59,3 +60,11 @@ export default defineComponent({
 })
 </script>
 
+<style>
+.socials {
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+</style>
