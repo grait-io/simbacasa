@@ -24,6 +24,7 @@ export default defineComponent({
     const tg = (window as any).Telegram.WebApp
 
     const handleGetStarted = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       tg.HapticFeedback.impactOccurred('medium')
       router.push('/name')
     }
