@@ -18,21 +18,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: Welcome },
-    { 
-      path: '/name', 
-      component: Name,
-      beforeEnter: (to, from, next) => {
-        // Ensure Pinia is initialized before entering the route
-        try {
-          const app = createApp({})
-          app.use(pinia)
-          next()
-        } catch (e) {
-          console.error('Failed to initialize Pinia:', e)
-          next(false)
-        }
-      }
-    },
+    { path: '/name', component: Name },
     { path: '/socials', component: Socials },
     { path: '/about-you', component: AboutYou },
     { path: '/referrals', component: Referrals },
