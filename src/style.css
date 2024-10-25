@@ -12,6 +12,7 @@
 body {
   font-family: 'Univers LT Std', sans-serif;
   margin: 0;
+  background-color: var(--background-color);
 }
 
 #app {
@@ -187,11 +188,15 @@ textarea {
   --primary-color: #26515B;
   --text-color: #FFFFFF;
   --background-color: #0D1520;
-  --border-color: transparent;
+  --border-color: rgba(0, 102, 255, 0.3);
   --placeholder-color: rgba(255, 255, 255, 0.6);
   --error-color: #E74C3C;
   --disabled-color: rgba(255, 255, 255, 0.3);
   --deactivated-button-color: rgba(38, 81, 91, 0.5);
+}
+
+.dark-theme body {
+  background-color: var(--background-color);
 }
 
 .dark-theme #app {
@@ -200,13 +205,13 @@ textarea {
 
 .dark-theme input,
 .dark-theme textarea {
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
+  background: rgba(13, 21, 32, 0.8);
+  border: 1px solid var(--border-color);
 }
 
 .dark-theme .social-link {
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
+  background: rgba(13, 21, 32, 0.8);
+  border: 1px solid var(--border-color);
 }
 
 .dark-theme .primary-button {
@@ -215,4 +220,9 @@ textarea {
 
 .dark-theme .primary-button:disabled {
   background-color: var(--deactivated-button-color);
+}
+
+/* Ensure dark background extends to html element */
+.dark-theme html {
+  background-color: var(--background-color);
 }
