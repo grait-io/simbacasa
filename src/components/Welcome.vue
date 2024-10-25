@@ -49,6 +49,7 @@ export default defineComponent({
   margin: 0;
   box-sizing: border-box;
   background-color: var(--background-color);
+  overflow-x: hidden;
 }
 
 .content {
@@ -59,6 +60,7 @@ export default defineComponent({
   align-items: center;
   padding: 16px;
   text-align: center;
+  width: 100%;
 }
 
 .logo {

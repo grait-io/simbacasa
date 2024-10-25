@@ -9,25 +9,36 @@
   --deactivated-button-color: #8B9FA2;
 }
 
-html {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
   background-color: var(--background-color);
+  overflow-x: hidden;
 }
 
 body {
   font-family: 'Univers LT Std', sans-serif;
-  margin: 0;
-  background-color: var(--background-color);
-  min-height: 100vh;
+  position: relative;
 }
 
 #app {
   color: var(--text-color);
   background-color: var(--background-color);
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
 }
 
 .content-wrapper {
@@ -38,7 +49,7 @@ body {
   max-width: 375px;
   flex: 1;
   padding: 20px;
-  box-sizing: border-box;
+  margin-bottom: 96px; /* Space for fixed button */
 }
 
 h2, .title {
@@ -95,6 +106,7 @@ textarea {
   display: flex;
   justify-content: center;
   box-sizing: border-box;
+  z-index: 10;
 }
 
 .primary-button {
@@ -223,4 +235,11 @@ textarea {
 
 .dark-theme .primary-button:disabled {
   background-color: var(--deactivated-button-color);
+}
+
+/* Prevent content from being hidden under keyboard */
+@supports (-webkit-touch-callout: none) {
+  .content-wrapper {
+    padding-bottom: 120px;
+  }
 }
