@@ -1,11 +1,15 @@
 <template>
   <div class="welcome">
-    <img src="/logo.png" alt="SimbiCasa Logo" class="logo centered-logo">
-    <h1>Welcome to SimbaCasa</h1>
-    <p>Find, Offer and Swap Homes within a trusted Community</p>
-    <button @click="handleGetStarted" class="primary-button">
-      Get started
-    </button>
+    <div class="content">
+      <img src="/logo.png" alt="SimbiCasa Logo" class="logo centered-logo">
+      <h1>Welcome to SimbaCasa</h1>
+      <p>Find, Offer and Swap Homes within a trusted Community</p>
+    </div>
+    <div class="button-container">
+      <button @click="handleGetStarted" class="primary-button">
+        Get started
+      </button>
+    </div>
   </div>
 </template>
 
@@ -36,18 +40,24 @@ export default defineComponent({
 
 <style scoped>
 .welcome {
-  /* Ensure centering by setting display to flex and justifying content */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  gap: 24px;
-  text-align: center;
   padding: 16px;
-  /* Add margin to ensure centering within parent container */
-  margin: 0 auto;
+  text-align: center;
 }
 
 .logo {
@@ -71,16 +81,4 @@ p {
   color: #6B7280;
   margin-bottom: 24px;
 }
-
-/*.primary-button {
-  width: 100%;
-  max-width: 300px;
-  padding: 12px 16px;
-  background-color: #164951;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-}*/
 </style>

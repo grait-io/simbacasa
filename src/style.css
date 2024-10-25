@@ -9,21 +9,22 @@
   --deactivated-button-color: #8B9FA2;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+}
+
 body {
   font-family: 'Univers LT Std', sans-serif;
-  margin: 0;
 }
 
 #app {
   color: var(--text-color);
-  background-color: #FDFCF8;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   min-height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
   position: relative;
 }
 
@@ -95,12 +96,7 @@ textarea {
 }
 
 .primary-button {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
+  width: calc(100% - 32px);
   max-width: 375px;
   height: 56px;
   background-color: var(--primary-color);
@@ -117,6 +113,10 @@ textarea {
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin-bottom: env(safe-area-inset-bottom, 20px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .primary-button:disabled {
@@ -204,8 +204,10 @@ textarea {
   --deactivated-button-color: rgba(38, 81, 91, 0.5);
 }
 
+.dark-theme html,
+.dark-theme body,
 .dark-theme #app {
-  background-color: #0D1520;
+  background-color: var(--background-color);
 }
 
 .dark-theme input,
