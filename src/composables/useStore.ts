@@ -1,5 +1,4 @@
 import { useUserStore } from '../store/user'
 
-export function useStore() {
-  return useUserStore()
-}
+// Simply re-export the store hook
+export const useStore = useUserStore
