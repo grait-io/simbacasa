@@ -44,12 +44,16 @@ body {
 .content-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
   max-width: 375px;
-  flex: 1;
-  padding: 20px;
-  margin-bottom: 96px; /* Space for fixed button */
+  min-height: 100vh;
+  padding: 20px 20px 96px 20px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.socials {
+  padding-top: 20px;
 }
 
 h2, .title {
@@ -237,9 +241,21 @@ textarea {
   background-color: var(--deactivated-button-color);
 }
 
-/* Prevent content from being hidden under keyboard */
+/* Mobile keyboard adjustments */
+@media screen and (max-height: 600px) {
+  .content-wrapper {
+    min-height: auto;
+    padding-bottom: 120px;
+  }
+}
+
+/* iOS specific adjustments */
 @supports (-webkit-touch-callout: none) {
   .content-wrapper {
     padding-bottom: 120px;
+  }
+  
+  .button-container {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 }
