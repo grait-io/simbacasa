@@ -17,26 +17,29 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../store/user'
+import { useStore } from '../composables/useStore'
 
 export default defineComponent({
   name: 'Name',
   setup() {
     const router = useRouter()
-    const userStore = useUserStore()
-    const tg = (window as any).Telegram.WebApp
-
     const firstName = ref('')
     const lastName = ref('')
     const lastNameInput = ref<HTMLInputElement | null>(null)
+    const store = useStore()
 
     const isFormValid = computed(() => firstName.value.trim() && lastName.value.trim())
 
     const handleSubmit = () => {
       if (isFormValid.value) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        userStore.updateUserData({ firstName: firstName.value, lastName: lastName.value })
-        tg.HapticFeedback.impactOccurred('medium')
+        store.updateUserData({ firstName: firstName.value, lastName: lastName.value })
+        try {
+          const tg = (window as any).Telegram?.WebApp
+          tg?.HapticFeedback?.impactOccurred?.('medium')
+        } catch (e) {
+          console.log('HapticFeedback not available')
+        }
         router.push('/socials')
       }
     }
@@ -55,12 +58,15 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => {
-      tg.ready()
-      tg.expand()
-    })
-
-    return { firstName, lastName, handleSubmit, isFormValid, lastNameInput, focusLastName, handleOutsideClick }
+    return { 
+      firstName, 
+      lastName, 
+      handleSubmit, 
+      isFormValid, 
+      lastNameInput, 
+      focusLastName, 
+      handleOutsideClick 
+    }
   }
 })
 </script>
