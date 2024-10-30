@@ -11,6 +11,9 @@
       <button @click="handleSubmit" class="primary-button" :disabled="isSubmitting">
         {{ isSubmitting ? 'Submitting...' : 'Continue' }}
       </button>
+      <button @click="handleBack" class="back-button">
+        Back
+      </button>
     </div>
   </div>
 </template>
@@ -99,6 +102,11 @@ export default defineComponent({
       }
     }
 
+    const handleBack = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      router.back()
+    }
+
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (!target.closest('input')) {
@@ -107,7 +115,7 @@ export default defineComponent({
       }
     }
 
-    return { referralSource, handleSubmit, error, isSubmitting, handleOutsideClick }
+    return { referralSource, handleSubmit, handleBack, error, isSubmitting, handleOutsideClick }
   }
 })
 </script>

@@ -104,7 +104,9 @@ textarea {
   right: 0;
   background: inherit;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   box-sizing: border-box;
   z-index: 10;
 }
@@ -131,6 +133,29 @@ textarea {
   justify-content: center;
   align-items: center;
   gap: 8px;
+}
+
+.back-button {
+  width: 120px;
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  font-family: 'Univers LT Std', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 150%;
+  text-align: center;
+  letter-spacing: 0.2px;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: var(--primary-color);
+  color: #FFFFFF;
 }
 
 .primary-button:disabled {
@@ -186,6 +211,16 @@ textarea {
 
 .dark-theme .primary-button:disabled {
   background-color: var(--deactivated-button-color);
+}
+
+.dark-theme .back-button {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.dark-theme .back-button:hover {
+  background-color: var(--primary-color);
+  color: #FFFFFF;
 }
 
 /* Mobile keyboard adjustments */
