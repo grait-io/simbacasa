@@ -3,7 +3,7 @@
     <div class="content">
       <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
       <h1>Welcome to SimbaCasa</h1>
-      <p>Find, Offer and Swap Homes within a trusted Community</p>
+      <p>Feeling home community</p>
     </div>
     <div class="button-container">
       <button @click="handleGetStarted" class="primary-button">
