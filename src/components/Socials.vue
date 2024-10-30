@@ -11,6 +11,9 @@
       <button @click="handleSubmit" class="primary-button" :disabled="!isFormValid">
         Continue
       </button>
+      <button @click="handleBack" class="back-button">
+        Back
+      </button>
     </div>
   </div>
 </template>
@@ -42,6 +45,11 @@ export default defineComponent({
       }
     }
 
+    const handleBack = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      router.back()
+    }
+
     const focusLinkedin = () => {
       if (linkedinInput.value) {
         linkedinInput.value.focus()
@@ -56,7 +64,16 @@ export default defineComponent({
       }
     }
 
-    return { instagram, linkedin, handleSubmit, linkedinInput, focusLinkedin, isFormValid, handleOutsideClick }
+    return { 
+      instagram, 
+      linkedin, 
+      handleSubmit, 
+      handleBack,
+      linkedinInput, 
+      focusLinkedin, 
+      isFormValid, 
+      handleOutsideClick 
+    }
   }
 })
 </script>

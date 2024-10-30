@@ -10,6 +10,9 @@
       <button @click="handleSubmit" class="primary-button">
         Continue
       </button>
+      <button @click="handleBack" class="back-button">
+        Back
+      </button>
     </div>
   </div>
 </template>
@@ -34,6 +37,11 @@ export default defineComponent({
       router.push('/referrals')
     }
 
+    const handleBack = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      router.back()
+    }
+
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (!target.closest('textarea')) {
@@ -42,7 +50,7 @@ export default defineComponent({
       }
     }
 
-    return { about, handleSubmit, aboutTextarea, handleOutsideClick }
+    return { about, handleSubmit, handleBack, aboutTextarea, handleOutsideClick }
   }
 })
 </script>
