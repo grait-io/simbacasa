@@ -95,7 +95,7 @@ h2 {
   font-family: 'Univers LT Std';
   font-style: normal;
   font-weight: 400;
-  font-size: 58px;
+  font-size: 56px;
   line-height: 120%;
   text-align: center;
   letter-spacing: -0.022em;
@@ -110,6 +110,6 @@ h2 b {
 p {
   color: var(--placeholder-color);
   margin-bottom: 24px;
-  font-size: 28px;
+  font-size: 27px;
 }
 </style>
