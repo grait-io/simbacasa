@@ -1,7 +1,7 @@
 <template>
   <div class="welcome">
     <div class="content">
-      <img src="/logo.png" alt="SimbiCasa Logo" class="logo centered-logo">
+      <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
       <h1>Welcome to SimbaCasa</h1>
       <p>Find, Offer and Swap Homes within a trusted Community</p>
     </div>
