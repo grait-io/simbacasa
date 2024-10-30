@@ -2,7 +2,8 @@
   <div class="welcome">
     <div class="content">
       <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
-      <h1>Welcome to SimbaCasa</h1>
+      <h2>Welcome to </h2>
+      <h2><b>Simba</b>Casa</h2>
       <p>Feeling home community</p>
     </div>
     <div class="button-container">
