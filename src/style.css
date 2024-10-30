@@ -98,7 +98,7 @@ textarea {
 .button-container {
   width: 100%;
   padding: 16px;
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
@@ -191,8 +191,25 @@ textarea {
 /* Mobile keyboard adjustments */
 @media screen and (max-height: 600px) {
   .content-wrapper {
-    min-height: auto;
+    min-height: 100%;
     padding-bottom: 120px;
+  }
+
+  .button-container {
+    position: relative;
+    margin-top: auto;
+  }
+}
+
+/* Android specific adjustments */
+@supports (-webkit-appearance:none) and (not (overflow:-webkit-marquee)) and (not (-ms-ime-align:auto)) {
+  .content-wrapper {
+    min-height: -webkit-fill-available;
+  }
+  
+  .button-container {
+    position: relative;
+    margin-top: auto;
   }
 }
 
