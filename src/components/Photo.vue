@@ -55,7 +55,7 @@ import { useUserStore } from '../store/user'
 import tg from '../telegram'
 
 const TABLE_ID = 'tblmd41XoXrQFYtezww'
-const FIELD_ID = 'actZlvYpz76WIV8Bsrg' // Updated to correct field ID
+const FIELD_ID = 'fldVDrB2zjnk14YvFcL' // Updated to correct field ID
 const API_TOKEN = 'teable_accwindRYobD2azy8ne_O83Or+XMAmIdRe4c5xEcWS7NDkYw9K20rF6O8+XqnbA='
 
 export default defineComponent({
@@ -207,11 +207,15 @@ export default defineComponent({
 
         // First create the record without the photo
         console.log('Creating record...')
-        const createRecordResponse = await fetch(`https://teable.grait.io/api/table/${TABLE_ID}/record`, {
+        const createRecordUrl = new URL(`https://teable.grait.io/api/table/${TABLE_ID}/record`)
+        createRecordUrl.searchParams.append('fieldKeyType', 'id')
+
+        const createRecordResponse = await fetch(createRecordUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${API_TOKEN}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
           body: JSON.stringify({
             records: [{
@@ -241,38 +245,40 @@ export default defineComponent({
         const response = await fetch(capturedImage.value)
         const blob = await response.blob()
 
-        // Create FormData with the blob
+        // Create FormData and append the file
         const formData = new FormData()
         formData.append('file', blob, 'verification.jpg')
+        formData.append('fileUrl', '') // Optional parameter from Swagger spec
 
         // Upload the attachment using the correct endpoint
         console.log('Uploading attachment...')
-        try {
-          const attachmentResponse = await fetch(`https://teable.grait.io/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${API_TOKEN}`
-            },
-            body: formData
-          })
+        const uploadUrl = new URL(`https://teable.grait.io/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`)
+        uploadUrl.searchParams.append('fieldKeyType', 'id')
+        console.log('Upload URL:', uploadUrl.toString())
+        
+        const attachmentResponse = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${API_TOKEN}`,
+            'Accept': 'application/json'
+          },
+          body: formData
+        })
 
-          if (attachmentResponse.ok) {
-            const attachmentData = await attachmentResponse.json()
-            console.log('Attachment uploaded:', attachmentData)
-          } else {
-            console.log('Failed to upload attachment')
-            throw new Error('Failed to upload attachment')
-          }
-        } catch (attachmentErr) {
-          console.error('Error uploading attachment:', attachmentErr)
-          throw new Error('Failed to upload attachment')
+        if (!attachmentResponse.ok) {
+          const errorData = await attachmentResponse.json().catch(() => ({}))
+          console.error('Upload failed:', errorData)
+          throw new Error(`Failed to upload attachment: ${attachmentResponse.status}`)
         }
+
+        const attachmentData = await attachmentResponse.json()
+        console.log('Attachment uploaded successfully:', attachmentData)
 
         // Continue to confirmation
         router.push('/confirmation')
       } catch (err) {
         console.error('Error:', err)
-        error.value = 'Failed to save data. Please try again.'
+        error.value = err instanceof Error ? err.message : 'Failed to save data. Please try again.'
       } finally {
         isSubmitting.value = false
       }
