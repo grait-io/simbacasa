@@ -7,12 +7,22 @@ export default defineComponent({
         const tg = window.Telegram.WebApp;
         const handleGetStarted = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            tg.HapticFeedback.impactOccurred('medium');
+            try {
+                tg.HapticFeedback?.impactOccurred?.('medium');
+            }
+            catch (e) {
+                console.log('HapticFeedback not available');
+            }
             router.push('/name');
         };
         onMounted(() => {
-            tg.ready();
-            tg.expand();
+            try {
+                tg.ready?.();
+                tg.expand?.();
+            }
+            catch (e) {
+                console.log('Telegram WebApp not fully available');
+            }
         });
         return { handleGetStarted };
     }

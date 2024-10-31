@@ -55,6 +55,7 @@ import { useUserStore } from '../store/user'
 import tg from '../telegram'
 
 const TABLE_ID = 'tblmd41XoXrQFYtezww'
+const FIELD_ID = 'Photo' // Updated to correct field ID
 const API_TOKEN = 'teable_accwindRYobD2azy8ne_O83Or+XMAmIdRe4c5xEcWS7NDkYw9K20rF6O8+XqnbA='
 
 export default defineComponent({
@@ -244,10 +245,10 @@ export default defineComponent({
         const formData = new FormData()
         formData.append('file', blob, 'verification.jpg')
 
-        // Try to upload the attachment but don't throw on error
+        // Upload the attachment using the correct endpoint
         console.log('Uploading attachment...')
         try {
-          const attachmentResponse = await fetch(`https://teable.grait.io/api/table/${TABLE_ID}/record/${recordId}/attachment`, {
+          const attachmentResponse = await fetch(`https://teable.grait.io/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${API_TOKEN}`
@@ -258,38 +259,16 @@ export default defineComponent({
           if (attachmentResponse.ok) {
             const attachmentData = await attachmentResponse.json()
             console.log('Attachment uploaded:', attachmentData)
-
-            // Try to update the record with the attachment ID
-            try {
-              const updateResponse = await fetch(`https://teable.grait.io/api/table/${TABLE_ID}/record/${recordId}`, {
-                method: 'PATCH',
-                headers: {
-                  'Authorization': `Bearer ${API_TOKEN}`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  fields: {
-                    Photo: [attachmentData.id]
-                  }
-                })
-              })
-
-              if (updateResponse.ok) {
-                console.log('Record updated with attachment')
-              } else {
-                console.log('Failed to update record with attachment, continuing anyway')
-              }
-            } catch (updateErr) {
-              console.log('Error updating record with attachment, continuing anyway:', updateErr)
-            }
           } else {
-            console.log('Failed to upload attachment, continuing anyway')
+            console.log('Failed to upload attachment')
+            throw new Error('Failed to upload attachment')
           }
         } catch (attachmentErr) {
-          console.log('Error uploading attachment, continuing anyway:', attachmentErr)
+          console.error('Error uploading attachment:', attachmentErr)
+          throw new Error('Failed to upload attachment')
         }
 
-        // Continue to confirmation regardless of attachment success
+        // Continue to confirmation
         router.push('/confirmation')
       } catch (err) {
         console.error('Error:', err)
