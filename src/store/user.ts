@@ -8,6 +8,7 @@ interface UserState {
   about: string;
   referralSource: string;
   telegramUsername: string;
+  questionsAndAnswers: string;
 }
 
 export const useUserStore = defineStore('user', {
@@ -18,7 +19,8 @@ export const useUserStore = defineStore('user', {
     linkedin: '',
     about: '',
     referralSource: '',
-    telegramUsername: ''
+    telegramUsername: '',
+    questionsAndAnswers: ''
   }),
   actions: {
     updateUserData(data: Partial<UserState>) {
