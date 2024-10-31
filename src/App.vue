@@ -1,6 +1,6 @@
 <template>
   <div id="app" :class="{ 'dark-theme': isDarkTheme }">
-    <img v-if="!isWelcomePage" src="/logo.png" alt="Logo" class="app-logo" />
+    <img v-if="!isWelcomePage" src="/logo.svg" alt="Logo" class="app-logo" />
     <router-view></router-view>
   </div>
 </template>
