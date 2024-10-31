@@ -5,7 +5,6 @@ interface UserState {
   lastName: string;
   instagram: string;
   linkedin: string;
-  about: string;
   referralSource: string;
   telegramUsername: string;
   questionsAndAnswers: string;
@@ -17,7 +16,6 @@ export const useUserStore = defineStore('user', {
     lastName: '',
     instagram: '',
     linkedin: '',
-    about: '',
     referralSource: '',
     telegramUsername: '',
     questionsAndAnswers: ''

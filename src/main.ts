@@ -5,9 +5,9 @@ import App from './App.vue'
 import Welcome from './components/Welcome.vue'
 import Name from './components/Name.vue'
 import Socials from './components/Socials.vue'
-import AboutYou from './components/AboutYou.vue'
 import Questions from './components/Questions.vue'
 import Referrals from './components/Referrals.vue'
+import Photo from './components/Photo.vue'
 import Confirmation from './components/Confirmation.vue'
 import tg from './telegram'
 
@@ -21,9 +21,9 @@ const router = createRouter({
     { path: '/', component: Welcome },
     { path: '/name', component: Name },
     { path: '/socials', component: Socials },
-    { path: '/about-you', component: AboutYou },
     { path: '/questions', component: Questions },
     { path: '/referrals', component: Referrals },
+    { path: '/photo', component: Photo },
     { path: '/confirmation', component: Confirmation },
   ]
 })

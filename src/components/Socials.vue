@@ -41,7 +41,7 @@ export default defineComponent({
       if (isFormValid.value) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         userStore.updateUserData({ instagram: instagram.value, linkedin: linkedin.value })
-        router.push('/about-you')
+        router.push('/questions')
       }
     }
 
