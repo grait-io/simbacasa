@@ -1,5 +1,6 @@
 <template>
   <div id="app" :class="{ 'dark-theme': isDarkTheme }">
+    <img v-if="!isWelcomePage" src="/logo.png" alt="Logo" class="app-logo" />
     <router-view></router-view>
   </div>
 </template>
@@ -8,6 +9,7 @@
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from './store/user'
+import { useRoute } from 'vue-router'
 import './style.css'  // Import the centralized styles
 
 export default defineComponent({
@@ -16,6 +18,11 @@ export default defineComponent({
     const isDarkTheme = ref(false)
     let userStore: ReturnType<typeof useUserStore> | null = null
     const telegramUsername = ref('')
+    const route = useRoute()
+
+    const isWelcomePage = computed(() => {
+      return route.path === '/' || route.path === '/welcome'
+    })
 
     onMounted(() => {
       // Initialize store after component is mounted
@@ -51,13 +58,21 @@ export default defineComponent({
 
     return {
       isDarkTheme,
-      telegramUsername
+      telegramUsername,
+      isWelcomePage
     }
   }
 })
 </script>
 
 <style>
+.app-logo {
+  width: 33%;
+  display: block;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
 .logo {
   width: 100px;
   height: 100px;
