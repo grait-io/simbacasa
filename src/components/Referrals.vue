@@ -37,6 +37,7 @@ export default defineComponent({
     onMounted(() => {
       userStore.setTelegramUsername()
       console.log('Component mounted. Telegram username:', userStore.telegramUsername)
+      console.log('Current user store state:', userStore.$state)
     })
 
     const handleSubmit = async () => {
@@ -56,7 +57,7 @@ export default defineComponent({
         
         const telegramID = String(tg.initDataUnsafe?.user?.id || userStore.telegramUsername || tempTelegramID)
         console.log('TelegramID before submission:', telegramID, 'Type:', typeof telegramID)
-        
+
         const payload = {
           records: [
             {
@@ -66,6 +67,7 @@ export default defineComponent({
                 "Instagram": String(userStore.$state.instagram),
                 "About You": String(userStore.$state.about),
                 "Referral Source": String(userStore.$state.referralSource),
+                "Questions answered": String(userStore.$state.questionsAndAnswers),
                 "status": "pending",
                 "telegramID": telegramID
               }

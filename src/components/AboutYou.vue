@@ -34,7 +34,7 @@ export default defineComponent({
     const handleSubmit = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       userStore.updateUserData({ about: about.value })
-      router.push('/referrals')
+      router.push('/questions')
     }
 
     const handleBack = () => {
