@@ -55,7 +55,7 @@ import { useUserStore } from '../store/user'
 import tg from '../telegram'
 
 const TABLE_ID = 'tblmd41XoXrQFYtezww'
-const FIELD_ID = 'Photo' // Updated to correct field ID
+const FIELD_ID = 'actZlvYpz76WIV8Bsrg' // Updated to correct field ID
 const API_TOKEN = 'teable_accwindRYobD2azy8ne_O83Or+XMAmIdRe4c5xEcWS7NDkYw9K20rF6O8+XqnbA='
 
 export default defineComponent({
