@@ -1,18 +1,16 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
+    <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="referrals">
-      <h2>Referrals</h2>
-      <p class="title">How did you hear about us?</p>
-      <p>Let us know if a friend referred you.</p>
+      <p>Referrals</p>
+      
+      <p class="grey"> Let us know if a friend referred you.</p>
       <input v-model="referralSource" type="text" placeholder="Referral Source">
       <p v-if="error" class="error-message">{{ error }}</p>
     </div>
     <div class="button-container">
       <button @click="handleSubmit" class="primary-button" :disabled="isSubmitting">
         {{ isSubmitting ? 'Submitting...' : 'Continue' }}
-      </button>
-      <button @click="handleBack" class="back-button">
-        Back
       </button>
     </div>
   </div>

@@ -2,9 +2,9 @@
   <div class="welcome">
     <div class="content">
       <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
-      <h2>Welcome to </h2>
-      <h2><b>Simba</b>Casa</h2>
-      <p>Feeling home community</p>
+      <p>Welcome to <br>
+      <b>Simba</b>Casa</p>
+      <p class="grey">Feeling Home Community</p>
     </div>
     <div class="button-container">
       <button @click="handleGetStarted" class="primary-button">
@@ -108,7 +108,7 @@ h2 b {
 }
 
 p {
-  color: var(--placeholder-color);
+  /*color: var(--placeholder-color); */
   margin-bottom: 24px;
   font-size: 27px;
 }

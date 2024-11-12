@@ -2,8 +2,8 @@
   <div class="content-wrapper">
     <div class="confirmation">
       <div class="check-icon">✓</div>
-      <h2>Thank you, your submission is being processed</h2>
-      <p>We will get back to shortly with the result of your decision.</p>
+      <p>Thank you, your submission is being processed</p>
+      <p class="grey">We will get back to shortly with the result of your decision.</p>
     </div>
     <div class="button-container">
       <button class="primary-button" @click="handleExit">

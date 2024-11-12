@@ -1,12 +1,13 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
+    <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="questions" ref="questionsContainer">
-      <h2>Questions</h2>
+      <p>Questions</p>
       <div v-if="loading" class="loading">Loading questions...</div>
       <div v-else-if="error" class="error-message">{{ error }}</div>
       <div v-else class="questions-list">
         <div v-for="(question, index) in questions" :key="question.id" class="question-item">
-          <p class="title">{{ question.fields.question }}</p>
+          <p class="grey">{{ question.fields.question }}</p>
           <textarea 
             v-model="answers[index]" 
             :placeholder="'Your answer...'"
@@ -18,9 +19,6 @@
     <div class="button-container">
       <button @click="handleSubmit" class="primary-button" :disabled="isSubmitting || !canSubmit">
         {{ isSubmitting ? 'Submitting...' : 'Continue' }}
-      </button>
-      <button @click="handleBack" class="back-button">
-        Back
       </button>
     </div>
   </div>

@@ -1,8 +1,8 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
     <div class="name">
-      <h2>Your details</h2>
-      <p class="title">Find, offer and swap homes with a trusted community</p>
+      <p>Your Details</p>
+      <p class="grey">Find, offer and swap homes with a trusted community</p>
       <input v-model="firstName" type="text" placeholder="First Name" @keydown.enter="focusLastName">
       <input v-model="lastName" type="text" placeholder="Last Name" ref="lastNameInput" @keydown.enter="handleSubmit">
     </div>

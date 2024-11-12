@@ -1,9 +1,13 @@
 <template>
   <div class="content-wrapper">
+    <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="photo">
-      <h2>Verification Photo</h2>
-      <p class="title">Please take a photo of yourself</p>
-      <p>This helps us verify your identity.</p>
+      <p>Verification Photo</p>
+      
+      <p class="grey">Please take a photo of yourself.<br>
+        📷 
+        <br>
+      This photo will be only used to verify your identity.</p>
       
       <!-- Always render canvas but keep it hidden -->
       <canvas ref="canvas" style="display: none;"></canvas>
@@ -28,10 +32,7 @@
 
       <div class="preview-container" v-else>
         <img :src="capturedImage" alt="Captured photo" class="preview-image">
-        <div class="preview-buttons">
-          <button @click="retakePhoto" class="secondary-button">
-            Retake Photo
-          </button>
+        <div class="button-container">
           <button @click="handleSubmit" class="primary-button" :disabled="isSubmitting">
             {{ isSubmitting ? 'Uploading...' : 'Continue' }}
           </button>
@@ -40,9 +41,9 @@
 
       <p v-if="error" class="error-message">{{ error }}</p>
     </div>
-    <div class="button-container" v-if="!capturedImage">
-      <button @click="handleBack" class="back-button">
-        Back
+    <div v-if="!capturedImage" class="button-container">
+      <button @click="capturePhoto" class="primary-button" :disabled="!isCameraReady">
+        Take Photo
       </button>
     </div>
   </div>
@@ -403,23 +404,6 @@ export default defineComponent({
   border: 2px solid var(--tg-theme-button-color, #3390ec);
 }
 
-.preview-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  width: 100%;
-}
-
-.secondary-button {
-  background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-  color: var(--tg-theme-text-color, #000000);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 .error-message {
   color: #ff3b30;
   text-align: center;
@@ -430,14 +414,5 @@ export default defineComponent({
   color: var(--tg-theme-hint-color, #999999);
   text-align: center;
   margin-top: 8px;
-}
-
-.button-container {
-  margin-top: auto;
-  padding: 16px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 </style>

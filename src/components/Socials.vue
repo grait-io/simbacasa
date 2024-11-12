@@ -1,18 +1,17 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
+   
     <div class="socials">
-      <h2>Socials</h2>
-      <p class="title">Add your social accounts</p>
-      <p>We require at least one social account in order to verify your identity securely.</p>
+      <button @click="handleBack" class="back-button" aria-label="Go back"></button>
+      <p>Socials</p>
+      
+      <p class="grey">We require at least one social account in order to verify your identity securely.</p>
       <input v-model="instagram" type="text" placeholder="Instagram" @keydown.enter="focusLinkedin">
       <input v-model="linkedin" type="text" placeholder="LinkedIn" ref="linkedinInput">
     </div>
     <div class="button-container">
       <button @click="handleSubmit" class="primary-button" :disabled="!isFormValid">
         Continue
-      </button>
-      <button @click="handleBack" class="back-button">
-        Back
       </button>
     </div>
   </div>

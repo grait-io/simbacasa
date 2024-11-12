@@ -9,6 +9,13 @@
   --deactivated-button-color: #8B9FA2;
 }
 
+p {
+  font-family: 'Univers LT Std';
+  font-style: normal;
+  color: var(--text-color);
+  font-size: 55px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -69,9 +76,14 @@ p {
   font-size: 16px;
   line-height: 150%;
   letter-spacing: 0.2px;
-  color: var(--placeholder-color);
+  color: var(--text-color);
   text-align: center;
   margin: 8px 0 24px 0;
+}
+
+.grey {
+  color: var(--placeholder-color);
+  scale: 0.8;
 }
 
 input, textarea {
@@ -96,24 +108,20 @@ textarea {
 }
 
 .button-container {
-  width: 100%;
-  padding: 16px;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 16px;
   background: inherit;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  box-sizing: border-box;
-  z-index: 10;
+  justify-content: center;
+
+
 }
 
 .primary-button {
-  width: calc(100% - 32px);
-  max-width: 375px;
+  width: 343px;
   height: 56px;
   background-color: var(--primary-color);
   border-radius: 12px;
@@ -128,34 +136,41 @@ textarea {
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin-bottom: env(safe-area-inset-bottom, 20px);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
+  margin: 0;
 }
 
 .back-button {
-  width: 120px;
+  position: absolute;
+  top: 2em;
+  left: 20px;
+  width: 40px;
   height: 40px;
   background-color: transparent;
-  border: 1px solid var(--primary-color);
+  border: none;
   border-radius: 8px;
   font-family: 'Univers LT Std', sans-serif;
   font-style: normal;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 150%;
-  text-align: center;
-  letter-spacing: 0.2px;
+  font-size: 24px;
   color: var(--primary-color);
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.back-button::before {
+  content: "←";
 }
 
 .back-button:hover {
-  background-color: var(--primary-color);
-  color: #FFFFFF;
+  background-color: rgba(22, 73, 81, 0.1);
 }
 
 .primary-button:disabled {
@@ -214,13 +229,11 @@ textarea {
 }
 
 .dark-theme .back-button {
-  border-color: var(--primary-color);
   color: var(--primary-color);
 }
 
 .dark-theme .back-button:hover {
-  background-color: var(--primary-color);
-  color: #FFFFFF;
+  background-color: rgba(38, 81, 91, 0.2);
 }
 
 /* Mobile keyboard adjustments */
@@ -232,7 +245,6 @@ textarea {
 
   .button-container {
     position: relative;
-    margin-top: auto;
   }
 }
 
@@ -244,7 +256,6 @@ textarea {
   
   .button-container {
     position: relative;
-    margin-top: auto;
   }
 }
 
