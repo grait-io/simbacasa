@@ -41,9 +41,9 @@ class TeablePoller:
             return []
 
     def update_status(self, record_ids: list):
-        """Update the status of multiple records"""
+        """Update the status of multiple records to 'telegram'"""
         url = f"{self.base_url}/table/{self.table_id}/record"
-        records = [{"id": record_id, "fields": {"status": "processed"}} for record_id in record_ids]
+        records = [{"id": record_id, "fields": {"status": "telegram"}} for record_id in record_ids]
         
         payload = {
             "fieldKeyType": "name",
@@ -54,7 +54,7 @@ class TeablePoller:
         try:
             response = requests.patch(url, headers=self.headers, json=payload)
             response.raise_for_status()
-            print(f"Updated status to processed for records: {record_ids}")
+            print(f"Updated status to 'telegram' for records: {record_ids}")
             return True
         except requests.exceptions.RequestException as e:
             print(f"Failed to update record status: {str(e)}")
@@ -302,7 +302,7 @@ Telegram Group ID: {poller.telegram_group_id}
                     # Add users to group and get successful records
                     successful_records = manager.add_users(approved_records)
                     
-                    # Update status for successful additions
+                    # Update status for successful additions to 'telegram'
                     if successful_records:
                         if poller.update_status(successful_records):
                             print(f"Successfully processed {len(successful_records)} records")
