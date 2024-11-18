@@ -1,7 +1,7 @@
 from telethon.sync import TelegramClient
-from telethon.tl.functions.channels import InviteToChannelRequest
+from telethon.tl.functions.channels import InviteToChannelRequest, EditBannedRequest
 from telethon.tl.functions.messages import GetDialogsRequest
-from telethon.tl.types import InputPeerEmpty, InputPeerUser, InputPeerChannel
+from telethon.tl.types import InputPeerEmpty, InputPeerUser, InputPeerChannel, ChatBannedRights
 from telethon.errors.rpcerrorlist import PeerFloodError, UserPrivacyRestrictedError
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError
 import requests
@@ -14,6 +14,42 @@ import traceback
 
 # Load environment variables
 load_dotenv()
+
+class ProcessedIdsStorage:
+    def __init__(self, filename="processed_ids.json"):
+        self.filename = filename
+        self.processed_ids = self._load_processed_ids()
+
+    def _load_processed_ids(self):
+        """Load processed IDs from storage file"""
+        try:
+            if os.path.exists(self.filename):
+                with open(self.filename, 'r') as f:
+                    return json.load(f)
+            return {"added": [], "removed": []}
+        except Exception as e:
+            print(f"Error loading processed IDs: {str(e)}")
+            return {"added": [], "removed": []}
+
+    def _save_processed_ids(self):
+        """Save processed IDs to storage file"""
+        try:
+            with open(self.filename, 'w') as f:
+                json.dump(self.processed_ids, f)
+        except Exception as e:
+            print(f"Error saving processed IDs: {str(e)}")
+
+    def is_processed(self, telegram_id: int, action_type: str) -> bool:
+        """Check if a Telegram ID has been processed for a specific action"""
+        return telegram_id in self.processed_ids.get(action_type, [])
+
+    def mark_as_processed(self, telegram_id: int, action_type: str):
+        """Mark a Telegram ID as processed for a specific action"""
+        if action_type not in self.processed_ids:
+            self.processed_ids[action_type] = []
+        if telegram_id not in self.processed_ids[action_type]:
+            self.processed_ids[action_type].append(telegram_id)
+            self._save_processed_ids()
 
 class TeablePoller:
     def __init__(self):
@@ -40,10 +76,10 @@ class TeablePoller:
             print(f"Error fetching records: {str(e)}")
             return []
 
-    def update_status(self, record_ids: list):
-        """Update the status of multiple records to 'telegram'"""
+    def update_status(self, record_ids: list, new_status: str):
+        """Update the status of multiple records"""
         url = f"{self.base_url}/table/{self.table_id}/record"
-        records = [{"id": record_id, "fields": {"status": "telegram"}} for record_id in record_ids]
+        records = [{"id": record_id, "fields": {"status": new_status}} for record_id in record_ids]
         
         payload = {
             "fieldKeyType": "name",
@@ -54,13 +90,13 @@ class TeablePoller:
         try:
             response = requests.patch(url, headers=self.headers, json=payload)
             response.raise_for_status()
-            print(f"Updated status to 'telegram' for records: {record_ids}")
+            print(f"Updated status to '{new_status}' for records: {record_ids}")
             return True
         except requests.exceptions.RequestException as e:
             print(f"Failed to update record status: {str(e)}")
             return False
 
-    def get_approved_records(self):
+    def get_approved_records(self, processed_storage):
         """Get all approved records that need processing"""
         records = self.get_records()
         approved_records = []
@@ -72,12 +108,35 @@ class TeablePoller:
             record_id = record.get("id")
 
             if status == "approved" and telegram_id:
-                approved_records.append({
-                    "telegram_id": int(telegram_id),  # Ensure it's an integer
-                    "record_id": record_id
-                })
+                telegram_id = int(telegram_id)
+                if not processed_storage.is_processed(telegram_id, "added"):
+                    approved_records.append({
+                        "telegram_id": telegram_id,
+                        "record_id": record_id
+                    })
 
         return approved_records
+
+    def get_refused_records(self, processed_storage):
+        """Get all refused records that need processing"""
+        records = self.get_records()
+        refused_records = []
+
+        for record in records:
+            fields = record.get("fields", {})
+            status = fields.get("status")
+            telegram_id = fields.get("telegramID")
+            record_id = record.get("id")
+
+            if status == "refused" and telegram_id:
+                telegram_id = int(telegram_id)
+                if not processed_storage.is_processed(telegram_id, "removed"):
+                    refused_records.append({
+                        "telegram_id": telegram_id,
+                        "record_id": record_id
+                    })
+
+        return refused_records
 
 class TelegramGroupManager:
     def __init__(self):
@@ -186,16 +245,69 @@ class TelegramGroupManager:
             print("Make sure you have the correct group ID and you are a member of the group.")
         
         return groups
+
+    def remove_users(self, users, processed_storage):
+        """Remove multiple users from the group"""
+        group_hash = os.getenv("TELEGRAM_GROUP_HASH")
+        if not group_hash:
+            groups = self.get_groups()
+            target_group = next((g for g in groups if g['id'] == str(self.group_id)), None)
+            if not target_group:
+                raise ValueError(f"Could not find group with ID {self.group_id}")
+            group_hash = int(target_group['access_hash'])
+        else:
+            group_hash = int(group_hash)
+
+        target_group_entity = InputPeerChannel(self.group_id, group_hash)
+        error_count = 0
+        successful_records = []
+
+        rights = ChatBannedRights(
+            until_date=None,
+            view_messages=True,
+            send_messages=True,
+            send_media=True,
+            send_stickers=True,
+            send_gifs=True,
+            send_games=True,
+            send_inline=True,
+            embed_links=True
+        )
+
+        for user in users:
+            try:
+                user_entity = self.client.get_input_entity(user['telegram_id'])
+                if not isinstance(user_entity, InputPeerUser):
+                    print(f"Skipping user {user['telegram_id']}: Not a user entity")
+                    continue
+
+                print(f"Removing user with ID: {user['telegram_id']}")
+                
+                self.client(EditBannedRequest(
+                    target_group_entity,
+                    user_entity,
+                    rights
+                ))
+                
+                processed_storage.mark_as_processed(user['telegram_id'], "removed")
+                successful_records.append(user['record_id'])
+                
+                print("Waiting 60 seconds before next removal...")
+                time.sleep(60)
+                
+            except Exception as e:
+                print(f"Error removing user {user['telegram_id']}: {str(e)}")
+                traceback.print_exc()
+                error_count += 1
+                if error_count > 10:
+                    print("Too many errors occurred. Stopping script.")
+                    break
+                continue
         
-    def add_users(self, users):
-        """Add multiple users to the group
+        return successful_records
         
-        Args:
-            users (list): List of dictionaries containing user info with keys:
-                         - telegram_id: The user's Telegram ID
-                         - record_id: The Teable record ID
-        """
-        # Get the target group's access hash from environment or fetch it
+    def add_users(self, users, processed_storage):
+        """Add multiple users to the group"""
         group_hash = os.getenv("TELEGRAM_GROUP_HASH")
         if not group_hash:
             groups = self.get_groups()
@@ -212,7 +324,6 @@ class TelegramGroupManager:
         
         for user in users:
             try:
-                # Get the user's access hash
                 user_entity = self.client.get_input_entity(user['telegram_id'])
                 if not isinstance(user_entity, InputPeerUser):
                     print(f"Skipping user {user['telegram_id']}: Not a user entity")
@@ -225,10 +336,9 @@ class TelegramGroupManager:
                     [user_entity]
                 ))
                 
-                # Mark this record as successful
+                processed_storage.mark_as_processed(user['telegram_id'], "added")
                 successful_records.append(user['record_id'])
                 
-                # Wait between adds to avoid flood
                 print("Waiting 60 seconds before next add...")
                 time.sleep(60)
                 
@@ -237,6 +347,7 @@ class TelegramGroupManager:
                 break
             except UserPrivacyRestrictedError:
                 print(f"The user {user['telegram_id']} privacy settings do not allow you to add them. Marking as processed.")
+                processed_storage.mark_as_processed(user['telegram_id'], "added")
                 successful_records.append(user['record_id'])
                 continue
             except Exception as e:
@@ -268,10 +379,11 @@ def main():
     # Normal operation
     poller = TeablePoller()
     manager = TelegramGroupManager()
+    processed_storage = ProcessedIdsStorage()
     poll_interval = int(os.getenv("POLL_INTERVAL_SECONDS", "5"))
     
     print(f"""
-=== Direct Telegram Group Addition Service Started ===
+=== Direct Telegram Group Addition/Removal Service Started ===
 Polling interval: {poll_interval} seconds
 Table ID: {poller.table_id}
 Telegram Group ID: {poller.telegram_group_id}
@@ -292,22 +404,33 @@ Telegram Group ID: {poller.telegram_group_id}
         
         while True:
             try:
-                # Get approved records
-                approved_records = poller.get_approved_records()
-                
+                # Handle approved records
+                approved_records = poller.get_approved_records(processed_storage)
                 if approved_records:
                     print(f"\nProcessing {len(approved_records)} approved records")
                     print(f"Telegram IDs: {[r['telegram_id'] for r in approved_records]}")
                     
-                    # Add users to group and get successful records
-                    successful_records = manager.add_users(approved_records)
+                    successful_records = manager.add_users(approved_records, processed_storage)
                     
-                    # Update status for successful additions to 'telegram'
                     if successful_records:
-                        if poller.update_status(successful_records):
-                            print(f"Successfully processed {len(successful_records)} records")
+                        if poller.update_status(successful_records, 'telegram'):
+                            print(f"Successfully processed {len(successful_records)} approved records")
                         else:
-                            print("Failed to update status for records")
+                            print("Failed to update status for approved records")
+
+                # Handle refused records
+                refused_records = poller.get_refused_records(processed_storage)
+                if refused_records:
+                    print(f"\nProcessing {len(refused_records)} refused records")
+                    print(f"Telegram IDs: {[r['telegram_id'] for r in refused_records]}")
+                    
+                    successful_records = manager.remove_users(refused_records, processed_storage)
+                    
+                    if successful_records:
+                        if poller.update_status(successful_records, 'removed'):
+                            print(f"Successfully processed {len(successful_records)} refused records")
+                        else:
+                            print("Failed to update status for refused records")
                 
                 time.sleep(poll_interval)
                 
