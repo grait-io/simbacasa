@@ -9,31 +9,26 @@
   --deactivated-button-color: #8B9FA2;
 }
 
-p {
-  font-family: 'Univers LT Std';
-  font-style: normal;
-  color: var(--text-color);
-  font-size: 55px;
-}
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: var(--background-color);
-  overflow-x: hidden;
+html {
+  height: -webkit-fill-available;
 }
 
 body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
   font-family: 'Univers LT Std', sans-serif;
   position: relative;
+  overflow-x: hidden;
 }
 
 #app {
@@ -41,6 +36,7 @@ body {
   background-color: var(--background-color);
   width: 100%;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,7 +50,8 @@ body {
   width: 100%;
   max-width: 375px;
   min-height: 100vh;
-  padding: 20px 20px 96px 20px;
+  min-height: -webkit-fill-available;
+  padding: 16px 16px 60px 16px;
   margin: 0 auto;
   position: relative;
 }
@@ -78,7 +75,7 @@ p {
   letter-spacing: 0.2px;
   color: var(--text-color);
   text-align: center;
-  margin: 8px 0 24px 0;
+  margin: 4px 0;
 }
 
 .grey {
@@ -93,8 +90,8 @@ input, textarea {
   border-radius: 8px;
   font-size: 16px;
   color: var(--text-color);
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 8px;
+  margin-bottom: 8px;
   box-sizing: border-box;
 }
 
@@ -108,21 +105,21 @@ textarea {
 }
 
 .button-container {
-  position: fixed;
+  position: sticky;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px;
+  padding: 8px;
   background: inherit;
   display: flex;
   justify-content: center;
-
-
+  z-index: 10;
 }
 
 .primary-button {
-  width: 343px;
-  height: 56px;
+  width: 100%;
+  max-width: 343px;
+  height: 44px;
   background-color: var(--primary-color);
   border-radius: 12px;
   font-family: 'Univers LT Std', sans-serif;
@@ -237,14 +234,29 @@ textarea {
 }
 
 /* Mobile keyboard adjustments */
-@media screen and (max-height: 600px) {
+@media screen and (max-height: 700px) {
   .content-wrapper {
-    min-height: 100%;
-    padding-bottom: 120px;
+    min-height: auto;
+    padding-bottom: 16px;
   }
 
   .button-container {
     position: relative;
+    padding: 8px;
+    margin-top: 8px;
+  }
+
+  input, textarea {
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+
+  .primary-button {
+    height: 40px;
+  }
+
+  p {
+    margin: 4px 0;
   }
 }
 
@@ -262,10 +274,12 @@ textarea {
 /* iOS specific adjustments */
 @supports (-webkit-touch-callout: none) {
   .content-wrapper {
-    padding-bottom: 120px;
+    padding-bottom: 16px;
   }
   
   .button-container {
-    padding-bottom: env(safe-area-inset-bottom, 16px);
+    position: relative;
+    padding: 8px;
+    margin-top: 8px;
   }
 }
