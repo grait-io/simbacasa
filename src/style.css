@@ -15,28 +15,25 @@
   box-sizing: border-box;
 }
 
-html {
-  height: -webkit-fill-available;
-}
-
-body {
+html, body {
   width: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  height: 100%;
   margin: 0;
   padding: 0;
   background-color: var(--background-color);
+  overflow-x: hidden;
+}
+
+body {
   font-family: 'Univers LT Std', sans-serif;
   position: relative;
-  overflow-x: hidden;
 }
 
 #app {
   color: var(--text-color);
   background-color: var(--background-color);
   width: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,9 +46,8 @@ body {
   flex-direction: column;
   width: 100%;
   max-width: 375px;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  padding: 16px 16px 60px 16px;
+  min-height: 100%;
+  padding: 16px;
   margin: 0 auto;
   position: relative;
 }
@@ -105,21 +101,17 @@ textarea {
 }
 
 .button-container {
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin-top: auto;
   padding: 8px;
   background: inherit;
   display: flex;
   justify-content: center;
-  z-index: 10;
 }
 
 .primary-button {
   width: 100%;
   max-width: 343px;
-  height: 44px;
+  height: 40px;
   background-color: var(--primary-color);
   border-radius: 12px;
   font-family: 'Univers LT Std', sans-serif;
@@ -233,16 +225,22 @@ textarea {
   background-color: rgba(38, 81, 91, 0.2);
 }
 
+/* Form containers */
+.name, .socials {
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 /* Mobile keyboard adjustments */
 @media screen and (max-height: 700px) {
   .content-wrapper {
-    min-height: auto;
-    padding-bottom: 16px;
+    padding-bottom: 8px;
   }
 
   .button-container {
-    position: relative;
-    padding: 8px;
+    position: static;
     margin-top: 8px;
   }
 
@@ -252,34 +250,10 @@ textarea {
   }
 
   .primary-button {
-    height: 40px;
+    height: 36px;
   }
 
   p {
     margin: 4px 0;
-  }
-}
-
-/* Android specific adjustments */
-@supports (-webkit-appearance:none) and (not (overflow:-webkit-marquee)) and (not (-ms-ime-align:auto)) {
-  .content-wrapper {
-    min-height: -webkit-fill-available;
-  }
-  
-  .button-container {
-    position: relative;
-  }
-}
-
-/* iOS specific adjustments */
-@supports (-webkit-touch-callout: none) {
-  .content-wrapper {
-    padding-bottom: 16px;
-  }
-  
-  .button-container {
-    position: relative;
-    padding: 8px;
-    margin-top: 8px;
   }
 }
