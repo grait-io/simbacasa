@@ -1,285 +1,84 @@
 :root {
-  --primary-color: #164951;
-  --text-color: #2D5B62;
-  --background-color: #FDFCF8;
-  --border-color: #164951;
-  --placeholder-color: #6B7280;
-  --error-color: #dc3545;
-  --disabled-color: #ccc;
-  --deactivated-button-color: #8B9FA2;
-}
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
 html {
+  height: -webkit-fill-available;
   height: 100%;
 }
 
 body {
-  width: 100%;
-  height: 100%;
   margin: 0;
-  padding: 0;
-  background-color: var(--background-color);
-  font-family: 'Univers LT Std', sans-serif;
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  background: white;
+  color: black;
 }
 
 #app {
-  color: var(--text-color);
-  background-color: var(--background-color);
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
-.content-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 375px;
-  min-height: 100%;
-  padding: 16px;
-  margin: 0 auto;
-  position: relative;
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
 }
 
-h2, .title {
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 130%;
-  letter-spacing: 0.2px;
-  color: var(--text-color);
-  text-align: center;
-  margin: 0;
+/* Mobile viewport adjustments */
+@supports (-webkit-touch-callout: none) {
+  body {
+    /* Prevent scroll bounce on iOS */
+    position: fixed;
+    width: 100%;
+    height: -webkit-fill-available;
+  }
 }
 
-p {
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 150%;
-  letter-spacing: 0.2px;
-  color: var(--text-color);
-  text-align: center;
-  margin: 4px 0;
-}
-
-.grey {
-  color: var(--placeholder-color);
-  scale: 0.8;
-}
-
-/* Form containers */
-.name, .socials {
-  padding-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-}
-
-input, textarea {
-  width: 100%;
-  background: var(--background-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 16px;
-  color: var(--text-color);
-  padding: 8px;
-  margin-bottom: 8px;
-  box-sizing: border-box;
-}
-
-input::placeholder, textarea::placeholder {
-  color: var(--placeholder-color);
-}
-
-textarea {
-  height: 120px;
-  resize: none;
-}
-
-.button-container {
-  margin-top: auto;
-  padding: 8px;
-  background: inherit;
-  display: flex;
-  justify-content: center;
+/* Ensure content is always visible above keyboard */
+@media screen and (max-height: 500px) {
+  .content-wrapper {
+    min-height: auto;
+    padding-bottom: 20px;
+  }
 }
 
 .primary-button {
   width: 100%;
-  max-width: 343px;
-  height: 40px;
-  background-color: var(--primary-color);
-  border-radius: 12px;
-  font-family: 'Univers LT Std', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
-  text-align: center;
-  letter-spacing: 0.2px;
-  color: #FFFFFF;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-}
-
-.back-button {
-  position: absolute;
-  top: 2em;
-  left: 20px;
-  width: 40px;
-  height: 40px;
-  background-color: transparent;
+  padding: 16px;
+  background: #000;
+  color: white;
   border: none;
   border-radius: 8px;
-  font-family: 'Univers LT Std', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  color: var(--primary-color);
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.back-button::before {
-  content: "←";
-}
-
-.back-button:hover {
-  background-color: rgba(22, 73, 81, 0.1);
 }
 
 .primary-button:disabled {
-  background-color: var(--deactivated-button-color);
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.error-message {
-  color: var(--error-color);
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-/* Navigation header */
-.nav-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-.nav-header button {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* Dark mode styles */
-.dark-theme {
-  --primary-color: #26515B;
-  --text-color: #FFFFFF;
-  --background-color: #0D1520;
-  --border-color: rgba(0, 102, 255, 0.3);
-  --placeholder-color: rgba(255, 255, 255, 0.6);
-  --error-color: #E74C3C;
-  --disabled-color: rgba(255, 255, 255, 0.3);
-  --deactivated-button-color: rgba(38, 81, 91, 0.5);
-}
-
-.dark-theme input,
-.dark-theme textarea {
-  background: rgba(13, 21, 32, 0.8);
-  border: 1px solid var(--border-color);
-}
-
-.dark-theme .primary-button {
-  background-color: var(--primary-color);
-}
-
-.dark-theme .primary-button:disabled {
-  background-color: var(--deactivated-button-color);
-}
-
-.dark-theme .back-button {
-  color: var(--primary-color);
-}
-
-.dark-theme .back-button:hover {
-  background-color: rgba(38, 81, 91, 0.2);
-}
-
-/* Form containers */
-.name, .socials {
-  padding-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Mobile keyboard adjustments */
-@media screen and (max-height: 700px) {
-  body, #app {
-    height: auto;
-    min-height: 100%;
-  }
-
-  .content-wrapper {
-    height: auto;
-    min-height: 100%;
-    padding-bottom: 16px;
-  }
-
-  input, textarea {
-    padding: 10px;
-    margin-bottom: 6px;
-    padding-bottom: 8px;
-  }
-
-  .button-container {
-    position: static;
-    margin-top: 8px;
-  }
-
-  input, textarea {
-    padding: 8px;
-    margin-bottom: 6px;
-  }
-
-  .primary-button {
-    height: 36px;
-  }
-
-  p {
-    margin: 4px 0;
-  }
+.grey {
+  color: #666;
 }

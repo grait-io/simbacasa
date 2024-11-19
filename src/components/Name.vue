@@ -3,8 +3,21 @@
     <div class="name">
       <p>Your Details</p>
       <p class="grey">Find, offer and swap homes with a trusted community</p>
-      <input v-model="firstName" type="text" placeholder="First Name" @keydown.enter="focusLastName">
-      <input v-model="lastName" type="text" placeholder="Last Name" ref="lastNameInput" @keydown.enter="handleSubmit">
+      <input 
+        v-model="firstName" 
+        type="text" 
+        placeholder="First Name" 
+        @keydown.enter="focusLastName"
+        @focus="handleInputFocus"
+      >
+      <input 
+        v-model="lastName" 
+        type="text" 
+        placeholder="Last Name" 
+        ref="lastNameInput" 
+        @keydown.enter="handleSubmit"
+        @focus="handleInputFocus"
+      >
     </div>
     <div class="button-container">
       <button @click="handleSubmit" class="primary-button" :disabled="!isFormValid">
@@ -50,6 +63,13 @@ export default defineComponent({
       }
     }
 
+    const handleInputFocus = (event: FocusEvent) => {
+      const target = event.target as HTMLElement
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 300)
+    }
+
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       if (!target.closest('input')) {
@@ -65,17 +85,47 @@ export default defineComponent({
       isFormValid, 
       lastNameInput, 
       focusLastName, 
-      handleOutsideClick 
+      handleOutsideClick,
+      handleInputFocus
     }
   }
 })
 </script>
 
 <style>
+.content-wrapper {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 .name {
   padding-top: 20px;
   display: flex;
   flex-direction: column;
-  /*gap: 16px;*/
+  gap: 16px;
+}
+
+.name input {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 16px; /* Prevents iOS zoom on focus */
+}
+
+.button-container {
+  padding: 16px;
+  margin-top: auto;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .content-wrapper {
+    /* iOS-specific fix */
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  }
 }
 </style>
