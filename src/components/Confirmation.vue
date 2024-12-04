@@ -52,10 +52,6 @@ export default defineComponent({
   color: #45B369;
 }
 
-.dark-theme .check-icon {
-  background-color: rgba(69, 179, 105, 0.2);
-}
-
 .confirmation h2 {
   max-width: 80%;
   margin: 0 auto;
