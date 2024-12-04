@@ -11,7 +11,11 @@ export default defineComponent({
         const handleSubmit = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             userStore.updateUserData({ about: about.value });
-            router.push('/referrals');
+            router.push('/questions');
+        };
+        const handleBack = () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            router.back();
         };
         const handleOutsideClick = (event) => {
             const target = event.target;
@@ -20,7 +24,7 @@ export default defineComponent({
                 activeElement?.blur?.();
             }
         };
-        return { about, handleSubmit, aboutTextarea, handleOutsideClick };
+        return { about, handleSubmit, handleBack, aboutTextarea, handleOutsideClick };
     }
 });
 function __VLS_template() {
@@ -50,11 +54,13 @@ function __VLS_template() {
     __VLS_ctx.aboutTextarea;
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("button-container") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleSubmit) }, ...{ class: ("primary-button") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleBack) }, ...{ class: ("back-button") }, });
     __VLS_styleScopedClasses['content-wrapper'];
     __VLS_styleScopedClasses['about-you'];
     __VLS_styleScopedClasses['title'];
     __VLS_styleScopedClasses['button-container'];
     __VLS_styleScopedClasses['primary-button'];
+    __VLS_styleScopedClasses['back-button'];
     var __VLS_slots;
     var __VLS_inheritedAttrs;
     const __VLS_refs = {

@@ -55,9 +55,9 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '../store/user'
 import tg from '../telegram'
 
-const TABLE_ID = 'tblmd41XoXrQFYtezww'
-const FIELD_ID = 'fldVDrB2zjnk14YvFcL' // Updated to correct field ID
-const API_TOKEN = 'teable_accwindRYobD2azy8ne_O83Or+XMAmIdRe4c5xEcWS7NDkYw9K20rF6O8+XqnbA='
+const TABLE_ID = 'tbliWkyKE4dT2L9s1oM'
+const FIELD_ID = 'fldtPf6h96XFllw4sOM' // where the picture is stored
+const API_TOKEN = 'teable_accO8ibvH9yrZjyRH8C_xEua4r2Cre7YHIZMuO3s7tazZWJSUBOP+dO4uZqkV9k='
 
 export default defineComponent({
   name: 'Photo',
@@ -253,7 +253,7 @@ export default defineComponent({
 
         // Upload the attachment using the correct endpoint
         console.log('Uploading attachment...')
-        const uploadUrl = new URL(`https://teable.grait.io/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`)
+        const uploadUrl = new URL(`https://teable.simbacasa.com/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`)
         uploadUrl.searchParams.append('fieldKeyType', 'id')
         console.log('Upload URL:', uploadUrl.toString())
         

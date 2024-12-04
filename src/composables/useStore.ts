@@ -1,4 +1,4 @@
 import { useUserStore } from '../store/user'
 
-// Simply re-export the store hook
-export const useStore = useUserStore
+// Export a function that returns the store instance
+export const useStore = () => useUserStore()

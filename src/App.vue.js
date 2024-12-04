@@ -1,28 +1,25 @@
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, computed } from 'vue';
 import { useUserStore } from './store/user';
+import { useRoute } from 'vue-router';
 import './style.css'; // Import the centralized styles
 export default defineComponent({
     name: 'App',
     setup() {
-        const isDarkTheme = ref(false);
         let userStore = null;
         const telegramUsername = ref('');
+        const route = useRoute();
+        const isWelcomePage = computed(() => {
+            return route.path === '/' || route.path === '/welcome';
+        });
         onMounted(() => {
             // Initialize store after component is mounted
             userStore = useUserStore();
             // Ensure Telegram WebApp is available
             if (window.Telegram?.WebApp) {
                 const tg = window.Telegram.WebApp;
-                // Set the header color
-                tg.setHeaderColor?.(tg.headerColor);
-                // Set the background color
-                tg.setBackgroundColor?.(tg.backgroundColor);
-                // Check if dark theme is enabled
-                isDarkTheme.value = tg.colorScheme === 'dark';
-                // Listen for theme changes
-                tg.onEvent?.('themeChanged', () => {
-                    isDarkTheme.value = tg.colorScheme === 'dark';
-                });
+                // Force light theme colors
+                tg.setHeaderColor?.('#FDFCF8');
+                tg.setBackgroundColor?.('#FDFCF8');
                 // Set Telegram username only if store is initialized
                 if (userStore) {
                     userStore.setTelegramUsername();
@@ -34,8 +31,8 @@ export default defineComponent({
             }
         });
         return {
-            isDarkTheme,
-            telegramUsername
+            telegramUsername,
+            isWelcomePage
         };
     }
 });
@@ -56,13 +53,16 @@ function __VLS_template() {
     // CSS variable injection 
     // CSS variable injection end 
     let __VLS_resolvedLocalAndGlobalComponents;
-    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ id: ("app"), ...{ class: (({ 'dark-theme': __VLS_ctx.isDarkTheme })) }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ id: ("app"), });
+    if (!__VLS_ctx.isWelcomePage) {
+        __VLS_elementAsFunction(__VLS_intrinsicElements.img)({ src: ("/logo.svg"), alt: ("Logo"), ...{ class: ("app-logo") }, });
+    }
     const __VLS_0 = __VLS_resolvedLocalAndGlobalComponents.RouterView;
     /** @type { [typeof __VLS_components.RouterView, typeof __VLS_components.routerView, typeof __VLS_components.RouterView, typeof __VLS_components.routerView, ] } */
     // @ts-ignore
     const __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0({}));
     const __VLS_2 = __VLS_1({}, ...__VLS_functionalComponentArgsRest(__VLS_1));
-    __VLS_styleScopedClasses['dark-theme'];
+    __VLS_styleScopedClasses['app-logo'];
     var __VLS_slots;
     var __VLS_inheritedAttrs;
     const __VLS_refs = {};

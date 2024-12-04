@@ -1,21 +1,26 @@
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '../store/user';
+import { useStore } from '../composables/useStore';
 export default defineComponent({
     name: 'Name',
     setup() {
         const router = useRouter();
-        const userStore = useUserStore();
-        const tg = window.Telegram.WebApp;
         const firstName = ref('');
         const lastName = ref('');
         const lastNameInput = ref(null);
+        const store = useStore(); // Now properly calling the function
         const isFormValid = computed(() => firstName.value.trim() && lastName.value.trim());
         const handleSubmit = () => {
             if (isFormValid.value) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                userStore.updateUserData({ firstName: firstName.value, lastName: lastName.value });
-                tg.HapticFeedback.impactOccurred('medium');
+                store.updateUserData({ firstName: firstName.value, lastName: lastName.value });
+                try {
+                    const tg = window.Telegram?.WebApp;
+                    tg?.HapticFeedback?.impactOccurred?.('medium');
+                }
+                catch (e) {
+                    console.log('HapticFeedback not available');
+                }
                 router.push('/socials');
             }
         };
@@ -24,6 +29,12 @@ export default defineComponent({
                 lastNameInput.value.focus();
             }
         };
+        const handleInputFocus = (event) => {
+            const target = event.target;
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        };
         const handleOutsideClick = (event) => {
             const target = event.target;
             if (!target.closest('input')) {
@@ -31,11 +42,16 @@ export default defineComponent({
                 activeElement?.blur?.();
             }
         };
-        onMounted(() => {
-            tg.ready();
-            tg.expand();
-        });
-        return { firstName, lastName, handleSubmit, isFormValid, lastNameInput, focusLastName, handleOutsideClick };
+        return {
+            firstName,
+            lastName,
+            handleSubmit,
+            isFormValid,
+            lastNameInput,
+            focusLastName,
+            handleOutsideClick,
+            handleInputFocus
+        };
     }
 });
 function __VLS_template() {
@@ -58,16 +74,16 @@ function __VLS_template() {
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ onClick: (__VLS_ctx.handleOutsideClick) }, ...{ class: ("content-wrapper") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("name") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.h2, __VLS_intrinsicElements.h2)({});
-    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("title") }, });
-    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.focusLastName) }, value: ((__VLS_ctx.firstName)), type: ("text"), placeholder: ("First Name"), });
-    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.handleSubmit) }, value: ((__VLS_ctx.lastName)), type: ("text"), placeholder: ("Last Name"), ref: ("lastNameInput"), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("grey") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.focusLastName) }, ...{ onFocus: (__VLS_ctx.handleInputFocus) }, value: ((__VLS_ctx.firstName)), type: ("text"), placeholder: ("First Name"), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.handleSubmit) }, ...{ onFocus: (__VLS_ctx.handleInputFocus) }, value: ((__VLS_ctx.lastName)), type: ("text"), placeholder: ("Last Name"), ref: ("lastNameInput"), });
     // @ts-ignore navigation for `const lastNameInput = ref()`
     __VLS_ctx.lastNameInput;
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("button-container") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleSubmit) }, ...{ class: ("primary-button") }, disabled: ((!__VLS_ctx.isFormValid)), });
     __VLS_styleScopedClasses['content-wrapper'];
     __VLS_styleScopedClasses['name'];
-    __VLS_styleScopedClasses['title'];
+    __VLS_styleScopedClasses['grey'];
     __VLS_styleScopedClasses['button-container'];
     __VLS_styleScopedClasses['primary-button'];
     var __VLS_slots;

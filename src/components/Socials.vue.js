@@ -16,8 +16,12 @@ export default defineComponent({
             if (isFormValid.value) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 userStore.updateUserData({ instagram: instagram.value, linkedin: linkedin.value });
-                router.push('/about-you');
+                router.push('/questions');
             }
+        };
+        const handleBack = () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            router.back();
         };
         const focusLinkedin = () => {
             if (linkedinInput.value) {
@@ -31,7 +35,16 @@ export default defineComponent({
                 activeElement?.blur?.();
             }
         };
-        return { instagram, linkedin, handleSubmit, linkedinInput, focusLinkedin, isFormValid, handleOutsideClick };
+        return {
+            instagram,
+            linkedin,
+            handleSubmit,
+            handleBack,
+            linkedinInput,
+            focusLinkedin,
+            isFormValid,
+            handleOutsideClick
+        };
     }
 });
 function __VLS_template() {
@@ -53,9 +66,12 @@ function __VLS_template() {
     let __VLS_resolvedLocalAndGlobalComponents;
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ onClick: (__VLS_ctx.handleOutsideClick) }, ...{ class: ("content-wrapper") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("socials") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({ ...{ class: ("header") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleBack) }, ...{ class: ("back-button") }, "aria-label": ("Go back"), });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({ ...{ class: ("arrow") }, });
+    __VLS_elementAsFunction(__VLS_intrinsicElements.span, __VLS_intrinsicElements.span)({});
     __VLS_elementAsFunction(__VLS_intrinsicElements.h2, __VLS_intrinsicElements.h2)({});
-    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("title") }, });
-    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({});
+    __VLS_elementAsFunction(__VLS_intrinsicElements.p, __VLS_intrinsicElements.p)({ ...{ class: ("grey") }, });
     __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ ...{ onKeydown: (__VLS_ctx.focusLinkedin) }, value: ((__VLS_ctx.instagram)), type: ("text"), placeholder: ("Instagram"), });
     __VLS_elementAsFunction(__VLS_intrinsicElements.input, __VLS_intrinsicElements.input)({ value: ((__VLS_ctx.linkedin)), type: ("text"), placeholder: ("LinkedIn"), ref: ("linkedinInput"), });
     // @ts-ignore navigation for `const linkedinInput = ref()`
@@ -64,7 +80,10 @@ function __VLS_template() {
     __VLS_elementAsFunction(__VLS_intrinsicElements.button, __VLS_intrinsicElements.button)({ ...{ onClick: (__VLS_ctx.handleSubmit) }, ...{ class: ("primary-button") }, disabled: ((!__VLS_ctx.isFormValid)), });
     __VLS_styleScopedClasses['content-wrapper'];
     __VLS_styleScopedClasses['socials'];
-    __VLS_styleScopedClasses['title'];
+    __VLS_styleScopedClasses['header'];
+    __VLS_styleScopedClasses['back-button'];
+    __VLS_styleScopedClasses['arrow'];
+    __VLS_styleScopedClasses['grey'];
     __VLS_styleScopedClasses['button-container'];
     __VLS_styleScopedClasses['primary-button'];
     var __VLS_slots;

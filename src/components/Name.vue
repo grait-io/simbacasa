@@ -40,7 +40,7 @@ export default defineComponent({
     const firstName = ref('')
     const lastName = ref('')
     const lastNameInput = ref<HTMLInputElement | null>(null)
-    const store = useStore()
+    const store = useStore() // Now properly calling the function
 
     const isFormValid = computed(() => firstName.value.trim() && lastName.value.trim())
 
@@ -94,8 +94,6 @@ export default defineComponent({
 </script>
 
 <style>
-
-
 .name {
   padding-top: 20px;
   display: flex;
@@ -109,8 +107,6 @@ export default defineComponent({
   border: 1px solid #e0e0e0;
   font-size: 16px; /* Prevents iOS zoom on focus */
 }
-
-
 
 @supports (-webkit-touch-callout: none) {
   .content-wrapper {

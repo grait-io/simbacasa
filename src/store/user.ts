@@ -1,55 +1,73 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-interface UserState {
-  firstName: string;
-  lastName: string;
-  instagram: string;
-  linkedin: string;
-  referralSource: string;
-  telegramUsername: string;
-  questionsAndAnswers: string;
+export interface UserState {
+  firstName: string
+  lastName: string
+  instagram: string
+  linkedin: string
+  referralSource: string
+  telegramUsername: string
+  questionsAndAnswers: string
+  about: string
 }
 
-export const useUserStore = defineStore('user', {
-  state: (): UserState => ({
-    firstName: '',
-    lastName: '',
-    instagram: '',
-    linkedin: '',
-    referralSource: '',
-    telegramUsername: '',
-    questionsAndAnswers: ''
-  }),
-  actions: {
-    updateUserData(data: Partial<UserState>) {
-      Object.assign(this.$state, data);
-    },
-    setTelegramUsername() {
-      try {
-        const tg = (window as any).Telegram?.WebApp;
-        if (!tg) {
-          console.log('Telegram WebApp not available');
-          return;
-        }
+export const useUserStore = defineStore('user', () => {
+  const firstName = ref('')
+  const lastName = ref('')
+  const instagram = ref('')
+  const linkedin = ref('')
+  const referralSource = ref('')
+  const telegramUsername = ref('')
+  const questionsAndAnswers = ref('')
+  const about = ref('')
 
-        const user = tg.initDataUnsafe?.user;
-        const chat = tg.initDataUnsafe?.chat;
+  function updateUserData(data: Partial<UserState>) {
+    if (data.firstName !== undefined) firstName.value = data.firstName
+    if (data.lastName !== undefined) lastName.value = data.lastName
+    if (data.instagram !== undefined) instagram.value = data.instagram
+    if (data.linkedin !== undefined) linkedin.value = data.linkedin
+    if (data.referralSource !== undefined) referralSource.value = data.referralSource
+    if (data.telegramUsername !== undefined) telegramUsername.value = data.telegramUsername
+    if (data.questionsAndAnswers !== undefined) questionsAndAnswers.value = data.questionsAndAnswers
+    if (data.about !== undefined) about.value = data.about
+  }
 
-        // Check chat object for username first
-        if (chat?.username) {
-          this.telegramUsername = chat.username;
-          console.log('Telegram chat username set:', this.telegramUsername);
-        }
-        // Fallback to checking user object for username
-        else if (user?.username) {
-          this.telegramUsername = user.username;
-          console.log('Telegram user username set:', this.telegramUsername);
-        } else {
-          console.log('Failed to set Telegram username. Available data:', { user, chat });
-        }
-      } catch (e) {
-        console.error('Error setting Telegram username:', e);
+  function setTelegramUsername() {
+    try {
+      const tg = (window as any).Telegram?.WebApp
+      if (!tg) {
+        console.log('Telegram WebApp not available')
+        return
       }
+
+      const user = tg.initDataUnsafe?.user
+      const chat = tg.initDataUnsafe?.chat
+
+      if (chat?.username) {
+        telegramUsername.value = chat.username
+        console.log('Telegram chat username set:', telegramUsername.value)
+      } else if (user?.username) {
+        telegramUsername.value = user.username
+        console.log('Telegram user username set:', telegramUsername.value)
+      } else {
+        console.log('Failed to set Telegram username. Available data:', { user, chat })
+      }
+    } catch (e) {
+      console.error('Error setting Telegram username:', e)
     }
   }
-});
+
+  return {
+    firstName,
+    lastName,
+    instagram,
+    linkedin,
+    referralSource,
+    telegramUsername,
+    questionsAndAnswers,
+    about,
+    updateUserData,
+    setTelegramUsername
+  }
+})
