@@ -15,7 +15,7 @@
   -webkit-text-size-adjust: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --background: #1a1a1a;
     --teal-700: #8ECAD1;
@@ -23,13 +23,19 @@
   }
 
   body {
-    color: var(--white);
+    
+    /*color: var(--white);  */
+    background-color: var(--background);
   }
 
   input, textarea, select {
     background: #2a2a2a;
-    color: var(--white);
+    
     border-color: #404040;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #808080;
   }
 
   .nav-controls {
