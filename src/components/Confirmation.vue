@@ -3,7 +3,7 @@
     <div class="confirmation">
       <div class="check-icon">✓</div>
       <p>Thank you, your submission is being processed</p>
-      <p class="grey">We will get back to shortly with the result of your decision.</p>
+      <p class="grey">We will get back to shortly with the result of our decision.</p>
     </div>
     <div class="button-container">
       <button class="primary-button" @click="handleExit">

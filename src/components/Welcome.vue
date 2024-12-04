@@ -71,7 +71,6 @@ export default defineComponent({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 16px;
   text-align: center;
   width: 100%;
 }
