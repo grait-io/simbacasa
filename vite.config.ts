@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [vue()],
   optimizeDeps: {
     exclude: [
-      'vue-demi',
       'chunk-EAUNOWDZ',
       'chunk-YFT6OQ5R'
     ],
@@ -24,7 +23,11 @@ export default defineConfig({
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'pinia']
         }
-      }
+      },
+      external: ['vue-demi']
     }
+  },
+  resolve: {
+    dedupe: ['vue-demi', 'vue']
   }
 })

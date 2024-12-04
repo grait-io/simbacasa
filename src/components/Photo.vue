@@ -208,7 +208,7 @@ export default defineComponent({
 
         // First create the record without the photo
         console.log('Creating record...')
-        const createRecordUrl = new URL(`https://teable.grait.io/api/table/${TABLE_ID}/record`)
+        const createRecordUrl = new URL(`https://teable.simbacasa.com/api/table/${TABLE_ID}/record`)
         createRecordUrl.searchParams.append('fieldKeyType', 'id')
 
         const createRecordResponse = await fetch(createRecordUrl, {
