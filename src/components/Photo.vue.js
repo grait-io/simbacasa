@@ -136,7 +136,7 @@ export default defineComponent({
                 const telegramID = String(tg.initDataUnsafe?.user?.id || userStore.telegramUsername || 'temp_' + Math.random().toString(36).substr(2, 9));
                 // First create the record without the photo
                 console.log('Creating record...');
-                const createRecordUrl = new URL(`https://teable.grait.io/api/table/${TABLE_ID}/record`);
+                const createRecordUrl = new URL(`https://teable.simbacasa.com/api/table/${TABLE_ID}/record`);
                 createRecordUrl.searchParams.append('fieldKeyType', 'id');
                 const createRecordResponse = await fetch(createRecordUrl, {
                     method: 'POST',
