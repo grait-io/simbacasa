@@ -15,7 +15,8 @@ import './style.css'  // Import the centralized styles
 export default defineComponent({
   name: 'App',
   setup() {
-    let userStore: ReturnType<typeof useUserStore> | null = null
+    // Initialize store immediately in setup
+    const userStore = useUserStore()
     const telegramUsername = ref('')
     const route = useRoute()
 
@@ -24,9 +25,6 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      // Initialize store after component is mounted
-      userStore = useUserStore()
-      
       // Ensure Telegram WebApp is available
       if (window.Telegram?.WebApp) {
         const tg = window.Telegram.WebApp
@@ -35,11 +33,9 @@ export default defineComponent({
         tg.setHeaderColor?.('#FDFCF8')
         tg.setBackgroundColor?.('#FDFCF8')
 
-        // Set Telegram username only if store is initialized
-        if (userStore) {
-          userStore.setTelegramUsername()
-          telegramUsername.value = userStore.telegramUsername
-        }
+        // Set Telegram username
+        userStore.setTelegramUsername()
+        telegramUsername.value = userStore.telegramUsername
       } else {
         console.log('Telegram WebApp not available')
       }

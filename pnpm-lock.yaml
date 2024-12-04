@@ -27,13 +27,13 @@ importers:
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.1
-      '@types/vue':
-        specifier: ^2.0.0
-        version: 2.0.0(typescript@5.6.3)
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.1.4(vite@5.4.10(@types/node@22.10.1)(terser@5.36.0))(vue@3.5.13(typescript@5.6.3))
       '@vue/runtime-core':
+        specifier: ^3.5.13
+        version: 3.5.13
+      '@vue/runtime-dom':
         specifier: ^3.5.13
         version: 3.5.13
       '@vue/tsconfig':
@@ -318,10 +318,6 @@ packages:
 
   '@types/telegram-web-app@7.10.1':
     resolution: {integrity: sha512-GKL659G6lnHRAt3Dt7L1Fa0dwvc+ZZQtJcYrJVJGwjvsbi/Rcp1qKs9pFwb34/KC04+J+TlQj4D7yKo10sBSEw==}
-
-  '@types/vue@2.0.0':
-    resolution: {integrity: sha512-WDElkBv/o4lVwu6wYHB06AXs4Xo2fwDjJUpvPRc1QQdzkUSiGFjrYuSCy8raxLE5FObgKq8ND7R5gSZTFLK60w==}
-    deprecated: This is a stub types definition for vuejs (https://github.com/vuejs/vue). vuejs provides its own type definitions, so you don't need @types/vue installed!
 
   '@vitejs/plugin-vue@5.1.4':
     resolution: {integrity: sha512-N2XSI2n3sQqp5w7Y/AN/L2XDjBIRGqXko+eDp42sydYSBeJuSm5a1sLf8zakmo8u7tA8NmBgoDLA1HeOESjp9A==}
@@ -751,12 +747,6 @@ snapshots:
       undici-types: 6.20.0
 
   '@types/telegram-web-app@7.10.1': {}
-
-  '@types/vue@2.0.0(typescript@5.6.3)':
-    dependencies:
-      vue: 3.5.13(typescript@5.6.3)
-    transitivePeerDependencies:
-      - typescript
 
   '@vitejs/plugin-vue@5.1.4(vite@5.4.10(@types/node@22.10.1)(terser@5.36.0))(vue@3.5.13(typescript@5.6.3))':
     dependencies:

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,7 +14,8 @@ export default defineConfig({
     entries: [
       './src/**/*.vue',
       './src/**/*.ts'
-    ]
+    ],
+    include: ['vue-demi']
   },
   build: {
     target: 'esnext',
@@ -23,11 +25,13 @@ export default defineConfig({
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'pinia']
         }
-      },
-      external: ['vue-demi']
+      }
     }
   },
   resolve: {
-    dedupe: ['vue-demi', 'vue']
+    dedupe: ['vue-demi', 'vue'],
+    alias: {
+      'vue-demi': path.resolve(__dirname, 'node_modules/vue-demi/lib/index.mjs')
+    }
   }
 })

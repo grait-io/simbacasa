@@ -17,9 +17,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
-    "@types/vue": "^2.0.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/runtime-core": "^3.5.13",
+    "@vue/runtime-dom": "^3.5.13",
     "@vue/tsconfig": "^0.7.0",
     "terser": "^5.36.0",
     "typescript": "^5.5.3",
