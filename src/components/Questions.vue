@@ -2,7 +2,11 @@
   <div class="content-wrapper" @click="handleOutsideClick">
     <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="questions" ref="questionsContainer">
-      <p>Questions</p>
+      <button @click="handleBack" class="back-button" aria-label="Go back">
+          <span class="arrow">←</span>
+          <span>go back</span>
+        </button>
+      <h2>Questions</h2>
       <div v-if="loading" class="loading">Loading questions...</div>
       <div v-else-if="error" class="error-message">{{ error }}</div>
       <div v-else class="questions-list">
@@ -149,13 +153,13 @@ export default defineComponent({
 .questions-list {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  
 }
 
 .question-item {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  
 }
 
 textarea {

@@ -1,9 +1,13 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
-   
     <div class="socials">
-      <button @click="handleBack" class="back-button" aria-label="Go back"></button>
-      <p>Socials</p>
+      <div class="header">
+        <button @click="handleBack" class="back-button" aria-label="Go back">
+          <span class="arrow">←</span>
+          <span>go back</span>
+        </button>
+        <h2>Socials</h2>
+      </div>
       
       <p class="grey">We require at least one social account in order to verify your identity securely.</p>
       <input v-model="instagram" type="text" placeholder="Instagram" @keydown.enter="focusLinkedin">
@@ -83,5 +87,19 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+.page-title {
+  font-size: 24px;
+  color: var(--teal-700);
+  margin: 0;
+  padding: 0;
 }
 </style>

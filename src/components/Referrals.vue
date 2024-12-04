@@ -2,7 +2,12 @@
   <div class="content-wrapper" @click="handleOutsideClick">
     <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="referrals">
-      <p>Referrals</p>
+
+      <button @click="handleBack" class="back-button" aria-label="Go back">
+          <span class="arrow">←</span>
+          <span>go back</span>
+        </button>
+      <h2>Referral</h2>
       
       <p class="grey"> Let us know if a friend referred you.</p>
       <input v-model="referralSource" type="text" placeholder="Referral Source">

@@ -1,15 +1,17 @@
 <template>
-  <div class="welcome">
-    <div class="content">
-      <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
-      <p>Welcome to <br>
-      <b>Simba</b>Casa</p>
-      <p class="grey">Feeling Home Community</p>
-    </div>
-    <div class="button-container">
-      <button @click="handleGetStarted" class="primary-button">
-        Get started
-      </button>
+  <div  class="content-wrapper">
+    <div class="welcome">
+      <div class="content">
+        <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
+        <p>Welcome to <br>
+        <b>Simba</b>Casa</p>
+        <p class="grey">Feeling Home Community</p>
+      </div>
+      <div class="button-container">
+        <button @click="handleGetStarted" class="primary-button">
+          Get started
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -54,7 +56,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 100vh;
+  min-height: 69vh;
   width: 100%;
   padding: 0;
   margin: 0;
@@ -91,25 +93,7 @@ h1 {
   margin-bottom: 8px;
 }
 
-h2 {
-  font-family: 'Univers LT Std';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 56px;
-  line-height: 120%;
-  text-align: center;
-  letter-spacing: -0.022em;
- 
-}
 
-h2 b {
-  font-family: 'Univers LT Std';
-  font-weight: 800;  /* 73 black extended */
-}
 
-p {
-  /*color: var(--placeholder-color); */
-  margin-bottom: 24px;
-  font-size: 27px;
-}
+
 </style>

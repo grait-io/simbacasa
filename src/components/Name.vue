@@ -1,7 +1,8 @@
 <template>
   <div class="content-wrapper" @click="handleOutsideClick">
     <div class="name">
-      <p>Your Details</p>
+      
+      <h2>Your Details</h2>
       <p class="grey">Find, offer and swap homes with a trusted community</p>
       <input 
         v-model="firstName" 
@@ -93,20 +94,12 @@ export default defineComponent({
 </script>
 
 <style>
-.content-wrapper {
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: env(safe-area-inset-bottom);
-}
+
 
 .name {
   padding-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .name input {
@@ -117,10 +110,7 @@ export default defineComponent({
   font-size: 16px; /* Prevents iOS zoom on focus */
 }
 
-.button-container {
-  padding: 16px;
-  margin-top: auto;
-}
+
 
 @supports (-webkit-touch-callout: none) {
   .content-wrapper {
