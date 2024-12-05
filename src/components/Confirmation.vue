@@ -2,7 +2,9 @@
   <div class="content-wrapper">
     <div class="confirmation">
       <div class="check-icon">✓</div>
-      <p>Thank you, your submission is being processed</p>
+      
+      <p>Thank you, your submission is being processed.</p>
+      <h2>🙏🏼</h2>
       <p class="grey">We will get back to shortly with the result of our decision.</p>
     </div>
     <div class="button-container">

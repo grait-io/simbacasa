@@ -7,7 +7,7 @@
           <span class="arrow">←</span>
           <span>go back</span>
         </button>
-      <h2>Referral</h2>
+      <h2>🫂 Referral</h2>
       
       <p class="grey"> Let us know if a friend referred you.</p>
       <input v-model="referralSource" type="text" placeholder="Referral Source">

@@ -2,10 +2,10 @@
   <div class="content-wrapper">
     <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="photo">
-      <p>Verification Photo</p>
+      <p>📷 Verification Photo</p>
       
       <p class="grey">Please take a photo of yourself.<br>
-        📷 
+        
         <br>
       This photo will be only used to verify your identity.</p>
       

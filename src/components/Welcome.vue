@@ -6,6 +6,8 @@
         <p>Welcome to <br>
         <b>Simba</b>Casa</p>
         <p class="grey">Feeling Home Community</p>
+        <br/>
+        <p>🏘🌍✨</p class="logo centered-logo">
       </div>
       <div class="button-container">
         <button @click="handleGetStarted" class="primary-button">

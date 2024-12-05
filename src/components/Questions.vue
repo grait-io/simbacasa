@@ -6,7 +6,7 @@
           <span class="arrow">←</span>
           <span>go back</span>
         </button>
-      <h2>Questions</h2>
+      <h2>❔Questions</h2>
       <div v-if="loading" class="loading">Loading questions...</div>
       <div v-else-if="error" class="error-message">{{ error }}</div>
       <div v-else class="questions-list">
@@ -59,11 +59,11 @@ export default defineComponent({
 
     const fetchQuestions = async () => {
       try {
-        const url = new URL("https://teable.grait.io/api/table/tbl1tcysT4sGwT5jmTz/record")
+        const url = new URL("https://teable.simbacasa.com/api/table/tblQvE5M0trOm4aF151/record")
         const response = await fetch(url, {
           method: "GET",
           headers: {
-            "Authorization": "Bearer teable_accwindRYobD2azy8ne_O83Or+XMAmIdRe4c5xEcWS7NDkYw9K20rF6O8+XqnbA=",
+            "Authorization": "Bearer teable_accO8ibvH9yrZjyRH8C_xEua4r2Cre7YHIZMuO3s7tazZWJSUBOP+dO4uZqkV9k=",
             "Accept": "application/json"
           }
         })

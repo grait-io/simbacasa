@@ -2,8 +2,8 @@
   <div class="content-wrapper" @click="handleOutsideClick">
     <div class="name">
       
-      <h2>Your Details</h2>
-      <p class="grey">Find, offer and swap homes with a trusted community</p>
+      <h2>📝 Your Details</h2>
+      <p class="grey">Find, offer and swap homes with a trusted community. </p>
       <input 
         v-model="firstName" 
         type="text" 

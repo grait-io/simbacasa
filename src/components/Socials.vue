@@ -6,7 +6,7 @@
           <span class="arrow">←</span>
           <span>go back</span>
         </button>
-        <h2>Socials</h2>
+        <h2>🌐 Socials</h2>
       </div>
       
       <p class="grey">We require at least one social account in order to verify your identity securely.</p>
