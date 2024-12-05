@@ -1,8 +1,8 @@
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import InviteToChannelRequest, EditBannedRequest
 from telethon.tl.functions.messages import GetDialogsRequest
-from telethon.tl.types import InputPeerEmpty, InputPeerUser, InputPeerChannel, ChatBannedRights
-from telethon.errors.rpcerrorlist import PeerFloodError, UserPrivacyRestrictedError
+from telethon.tl.types import InputPeerEmpty, InputPeerUser, InputPeerChannel, ChatBannedRights, Channel
+from telethon.errors.rpcerrorlist import PeerFloodError, UserPrivacyRestrictedError, ChannelInvalidError
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError
 import requests
 import json
@@ -105,7 +105,7 @@ class TeablePoller:
             fields = record.get("fields", {})
             status = fields.get("status")
             telegram_id = fields.get("telegramID")
-            telegram_username = fields.get("telegramUsername", "")  # Add username field
+            telegram_username = fields.get("telegramUsername", "")
             record_id = record.get("id")
 
             if status == "approved" and telegram_id:
@@ -113,7 +113,7 @@ class TeablePoller:
                 if not processed_storage.is_processed(telegram_id, "added"):
                     approved_records.append({
                         "telegram_id": telegram_id,
-                        "telegram_username": telegram_username,  # Include username
+                        "telegram_username": telegram_username,
                         "record_id": record_id
                     })
 
@@ -128,7 +128,7 @@ class TeablePoller:
             fields = record.get("fields", {})
             status = fields.get("status")
             telegram_id = fields.get("telegramID")
-            telegram_username = fields.get("telegramUsername", "")  # Add username field
+            telegram_username = fields.get("telegramUsername", "")
             record_id = record.get("id")
 
             if status == "refused" and telegram_id:
@@ -136,7 +136,7 @@ class TeablePoller:
                 if not processed_storage.is_processed(telegram_id, "removed"):
                     refused_records.append({
                         "telegram_id": telegram_id,
-                        "telegram_username": telegram_username,  # Include username
+                        "telegram_username": telegram_username,
                         "record_id": record_id
                     })
 
@@ -327,17 +327,23 @@ class TelegramGroupManager:
         
     def add_users(self, users, processed_storage):
         """Add multiple users to the group"""
-        group_hash = os.getenv("TELEGRAM_GROUP_HASH")
-        if not group_hash:
-            groups = self.get_groups()
-            target_group = next((g for g in groups if g['id'] == str(self.group_id)), None)
-            if not target_group:
-                raise ValueError(f"Could not find group with ID {self.group_id}")
-            group_hash = int(target_group['access_hash'])
-        else:
-            group_hash = int(group_hash)
+        # Get the target group entity
+        try:
+            # First try to get the group directly
+            target_group = self.client.get_entity(self.group_id)
+            if not isinstance(target_group, Channel):
+                raise ValueError("Target is not a channel/group")
+            
+            print(f"Successfully found group: {target_group.title}")
+            target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
+        except Exception as e:
+            print(f"Error getting group entity directly: {str(e)}")
+            # Fallback to using stored hash
+            group_hash = os.getenv("TELEGRAM_GROUP_HASH")
+            if not group_hash:
+                raise ValueError("Could not find group and no access hash provided")
+            target_group_entity = InputPeerChannel(self.group_id, int(group_hash))
 
-        target_group_entity = InputPeerChannel(self.group_id, group_hash)
         error_count = 0
         successful_records = []
         
@@ -369,8 +375,8 @@ class TelegramGroupManager:
                 print(f"Adding user with ID: {user['telegram_id']}")
                 
                 self.client(InviteToChannelRequest(
-                    target_group_entity,
-                    [user_entity]
+                    channel=target_group_entity,
+                    users=[user_entity]
                 ))
                 
                 processed_storage.mark_as_processed(user['telegram_id'], "added")
@@ -387,6 +393,16 @@ class TelegramGroupManager:
                 processed_storage.mark_as_processed(user['telegram_id'], "added")
                 successful_records.append(user['record_id'])
                 continue
+            except ChannelInvalidError:
+                print("Invalid channel error. Trying to refresh group entity...")
+                try:
+                    target_group = self.client.get_entity(self.group_id)
+                    target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
+                    print("Successfully refreshed group entity")
+                    continue  # Retry the current user
+                except Exception as refresh_error:
+                    print(f"Failed to refresh group entity: {str(refresh_error)}")
+                    break
             except Exception as e:
                 print(f"Unexpected error while adding user {user['telegram_id']}: {str(e)}")
                 traceback.print_exc()
