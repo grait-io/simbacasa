@@ -4,7 +4,7 @@
       <div class="content">
         <img src="/logo.svg" alt="SimbiCasa Logo" class="logo centered-logo">
         <p>Welcome to <br>
-        <b>Simba</b>Casa</p>
+        <b>SimbaCasa</b></p>
         <p class="grey">Feeling Home Community</p>
         <br/>
         <p>🏘🌍✨</p class="logo centered-logo">

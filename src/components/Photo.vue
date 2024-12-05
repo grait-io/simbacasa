@@ -2,7 +2,7 @@
   <div class="content-wrapper">
     <button @click="handleBack" class="back-button" aria-label="Go back"></button>
     <div class="photo">
-      <p>📷 Verification Photo</p>
+      <p>📷  &nbsp;Verification Photo</p>
       
       <p class="grey">Please take a photo of yourself.<br>
         
@@ -208,10 +208,17 @@ export default defineComponent({
 
         // First create the record without the photo
         console.log('Creating record...')
-        const createRecordUrl = new URL(`https://teable.simbacasa.com/api/table/${TABLE_ID}/record`)
-        createRecordUrl.searchParams.append('fieldKeyType', 'id')
+        const createRecordUrl = `https://teable.simbacasa.com/api/table/${TABLE_ID}/record`
+        const queryParams = new URLSearchParams({ fieldKeyType: 'id' })
+        const fullUrl = `${createRecordUrl}?${queryParams.toString()}`
 
-        const createRecordResponse = await fetch(createRecordUrl, {
+        // Ensure LinkedIn URL is properly formatted
+        let linkedinUrl = userStore.$state.linkedin
+        if (linkedinUrl && !linkedinUrl.startsWith('https://')) {
+          linkedinUrl = `https://www.linkedin.com/in/${linkedinUrl.replace(/^.*\/in\//, '')}`
+        }
+
+        const createRecordResponse = await fetch(fullUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${API_TOKEN}`,
@@ -224,6 +231,7 @@ export default defineComponent({
                 "First name": String(userStore.$state.firstName),
                 "Last Name": String(userStore.$state.lastName),
                 "Instagram": String(userStore.$state.instagram),
+                "LinkedIn": linkedinUrl,
                 "Referral Source": String(userStore.$state.referralSource),
                 "Questions answered": String(userStore.$state.questionsAndAnswers),
                 "status": "pending",
@@ -234,7 +242,9 @@ export default defineComponent({
         })
 
         if (!createRecordResponse.ok) {
-          throw new Error('Failed to create record')
+          const errorData = await createRecordResponse.json().catch(() => ({}))
+          console.error('Create record failed:', errorData)
+          throw new Error(`Failed to create record: ${createRecordResponse.status}`)
         }
 
         const recordData = await createRecordResponse.json()
@@ -253,11 +263,11 @@ export default defineComponent({
 
         // Upload the attachment using the correct endpoint
         console.log('Uploading attachment...')
-        const uploadUrl = new URL(`https://teable.simbacasa.com/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`)
-        uploadUrl.searchParams.append('fieldKeyType', 'id')
-        console.log('Upload URL:', uploadUrl.toString())
+        const uploadUrl = `https://teable.simbacasa.com/api/table/${TABLE_ID}/record/${recordId}/${FIELD_ID}/uploadAttachment`
+        const uploadQueryParams = new URLSearchParams({ fieldKeyType: 'id' })
+        const fullUploadUrl = `${uploadUrl}?${uploadQueryParams.toString()}`
         
-        const attachmentResponse = await fetch(uploadUrl, {
+        const attachmentResponse = await fetch(fullUploadUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${API_TOKEN}`,
