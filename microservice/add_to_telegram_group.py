@@ -105,6 +105,7 @@ class TeablePoller:
             fields = record.get("fields", {})
             status = fields.get("status")
             telegram_id = fields.get("telegramID")
+            telegram_username = fields.get("telegramUsername", "")  # Add username field
             record_id = record.get("id")
 
             if status == "approved" and telegram_id:
@@ -112,6 +113,7 @@ class TeablePoller:
                 if not processed_storage.is_processed(telegram_id, "added"):
                     approved_records.append({
                         "telegram_id": telegram_id,
+                        "telegram_username": telegram_username,  # Include username
                         "record_id": record_id
                     })
 
@@ -126,6 +128,7 @@ class TeablePoller:
             fields = record.get("fields", {})
             status = fields.get("status")
             telegram_id = fields.get("telegramID")
+            telegram_username = fields.get("telegramUsername", "")  # Add username field
             record_id = record.get("id")
 
             if status == "refused" and telegram_id:
@@ -133,6 +136,7 @@ class TeablePoller:
                 if not processed_storage.is_processed(telegram_id, "removed"):
                     refused_records.append({
                         "telegram_id": telegram_id,
+                        "telegram_username": telegram_username,  # Include username
                         "record_id": record_id
                     })
 
@@ -276,7 +280,22 @@ class TelegramGroupManager:
 
         for user in users:
             try:
-                user_entity = self.client.get_input_entity(user['telegram_id'])
+                # Try to get user entity first by username if available
+                user_entity = None
+                if user.get('telegram_username'):
+                    try:
+                        user_entity = self.client.get_input_entity(user['telegram_username'])
+                    except ValueError:
+                        pass
+
+                # If username lookup failed, try by ID
+                if not user_entity:
+                    try:
+                        user_entity = self.client.get_input_entity(user['telegram_id'])
+                    except ValueError:
+                        print(f"Could not find user {user['telegram_id']}. Skipping...")
+                        continue
+
                 if not isinstance(user_entity, InputPeerUser):
                     print(f"Skipping user {user['telegram_id']}: Not a user entity")
                     continue
@@ -324,7 +343,25 @@ class TelegramGroupManager:
         
         for user in users:
             try:
-                user_entity = self.client.get_input_entity(user['telegram_id'])
+                # Try to get user entity first by username if available
+                user_entity = None
+                if user.get('telegram_username'):
+                    try:
+                        print(f"Trying to add user by username: {user['telegram_username']}")
+                        user_entity = self.client.get_input_entity(user['telegram_username'])
+                    except ValueError as e:
+                        print(f"Could not find user by username: {str(e)}")
+
+                # If username lookup failed, try by ID
+                if not user_entity:
+                    try:
+                        print(f"Trying to add user by ID: {user['telegram_id']}")
+                        user_entity = self.client.get_input_entity(user['telegram_id'])
+                    except ValueError as e:
+                        print(f"Could not find user by ID: {str(e)}")
+                        print("Please ensure the user has interacted with the bot or provide their username")
+                        continue
+
                 if not isinstance(user_entity, InputPeerUser):
                     print(f"Skipping user {user['telegram_id']}: Not a user entity")
                     continue

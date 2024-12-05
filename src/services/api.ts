@@ -7,6 +7,7 @@ export async function createRecord(data: {
   referralSource: string;
   questionsAnswered: string;
   telegramID: string;
+  telegramUsername: string;  // Added telegramUsername
 }) {
   const response = await fetch('/api/records', {
     method: 'POST',
@@ -22,7 +23,8 @@ export async function createRecord(data: {
           "Referral Source": data.referralSource,
           "Questions answered": data.questionsAnswered,
           "status": "pending",
-          "telegramID": data.telegramID
+          "telegramID": data.telegramID,
+          "telegramUsername": data.telegramUsername  // Added telegramUsername field
         }
       }]
     })

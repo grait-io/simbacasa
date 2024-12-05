@@ -203,8 +203,9 @@ export default defineComponent({
       error.value = ''
 
       try {
-        // Get Telegram ID
-        const telegramID = String(tg.initDataUnsafe?.user?.id || userStore.telegramUsername || 'temp_' + Math.random().toString(36).substr(2, 9))
+        // Get Telegram ID and username
+        const telegramID = String(tg.initDataUnsafe?.user?.id || 'temp_' + Math.random().toString(36).substr(2, 9))
+        const telegramUsername = userStore.telegramUsername || tg.initDataUnsafe?.user?.username || ''
 
         // First create the record without the photo
         console.log('Creating record...')
@@ -235,7 +236,8 @@ export default defineComponent({
                 "Referral Source": String(userStore.$state.referralSource),
                 "Questions answered": String(userStore.$state.questionsAndAnswers),
                 "status": "pending",
-                "telegramID": telegramID
+                "telegramID": telegramID,
+                "telegramUsername": telegramUsername  // Added telegramUsername field
               }
             }]
           })
