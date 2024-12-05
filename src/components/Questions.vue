@@ -167,8 +167,10 @@ textarea {
   padding: 12px;
   border: 1px solid var(--tg-theme-hint-color, #999999);
   border-radius: 8px;
-  background: var(--tg-theme-bg-color, #ffffff);
-  color: var(--tg-theme-text-color, #000000);
+  background:  #ffffff;
+  color:  #000000;
+  /* background: var(--tg-theme-bg-color, #ffffff);
+  color: var(--tg-theme-text-color, #000000);*/
   font-size: 16px;
   resize: vertical;
   min-height: 100px;
