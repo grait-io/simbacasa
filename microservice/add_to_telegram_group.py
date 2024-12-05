@@ -53,7 +53,7 @@ class ProcessedIdsStorage:
 
 class TeablePoller:
     def __init__(self):
-        self.base_url = "https://teable.grait.io/api"
+        self.base_url = os.getenv("BASE_URL")
         self.api_token = os.getenv("TEABLE_API_TOKEN")
         self.table_id = os.getenv("TEABLE_TABLE_ID")
         self.telegram_group_id = os.getenv("TELGRAM_GROUP_ID")
