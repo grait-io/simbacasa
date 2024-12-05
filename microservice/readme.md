@@ -18,7 +18,8 @@
 	•	API_HASH
 
 
-
+Get group hashes:
+python add_to_telegram_group.py --list-groups
 
 Use the microservice:
 
