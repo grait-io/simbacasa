@@ -31,4 +31,4 @@ src/telegram.js
 
 # Environment variables
 .env
-*.vue.js.map
+*.vue.js.mapmicroservice/.env
