@@ -11,9 +11,59 @@ from dotenv import load_dotenv
 import os
 import sys
 import traceback
+import re  # Added for ID validation
 
-# Load environment variables
+# Ensure environment variables are loaded
 load_dotenv()
+
+def safe_int_convert(value, default=None, error_message=None):
+    """
+    Safely convert a value to an integer with optional default and error handling.
+    
+    :param value: Value to convert
+    :param default: Default value if conversion fails
+    :param error_message: Custom error message to print if conversion fails
+    :return: Converted integer or default value
+    """
+    try:
+        return int(value) if value is not None else default
+    except (ValueError, TypeError) as e:
+        if error_message:
+            print(error_message)
+        if default is None:
+            raise
+        return default
+
+def get_required_env_var(var_name, default=None, required=True, convert_func=None):
+    """
+    Retrieve an environment variable with optional type conversion and requirement.
+    
+    :param var_name: Name of the environment variable
+    :param default: Default value if not set (only used if not required)
+    :param required: Whether the variable is required
+    :param convert_func: Optional function to convert the value
+    :return: Value of the environment variable
+    """
+    value = os.getenv(var_name)
+    
+    if value is None:
+        if required:
+            raise ValueError(f"Missing required environment variable: {var_name}")
+        return default
+    
+    if convert_func:
+        try:
+            return convert_func(value)
+        except (ValueError, TypeError) as e:
+            if required:
+                raise ValueError(f"Invalid value for {var_name}: {str(e)}")
+            return default
+    
+    return value
+
+class ConfigurationError(Exception):
+    """Custom exception for configuration-related errors"""
+    pass
 
 class ProcessedIdsStorage:
     def __init__(self, filename="processed_ids.json"):
@@ -53,23 +103,47 @@ class ProcessedIdsStorage:
 
 class TeablePoller:
     def __init__(self):
-        self.base_url = os.getenv("BASE_URL")
-        self.api_token = os.getenv("TEABLE_API_TOKEN")
-        self.table_id = os.getenv("TEABLE_TABLE_ID")
-        self.telegram_group_id = os.getenv("TELGRAM_GROUP_ID")
-        
-        # New webhook URLs
-        self.n8n_webhook_received_url = os.getenv("N8N_WEBHOOK_RECEIVED_URL")
-        self.n8n_webhook_accepted_url = os.getenv("N8N_WEBHOOK_ACCEPTED_URL")
+        # Validate and retrieve configuration
+        try:
+            self.base_url = get_required_env_var("BASE_URL")
+            self.api_token = get_required_env_var("TEABLE_API_TOKEN")
+            self.table_id = get_required_env_var("TEABLE_TABLE_ID")
+            self.telegram_group_id = get_required_env_var("TELGRAM_GROUP_ID")
+            
+            # Webhook URLs (some can be optional)
+            self.n8n_webhook_received_url = get_required_env_var("N8N_WEBHOOK_RECEIVED_URL", required=False)
+            self.n8n_webhook_accepted_url = get_required_env_var("N8N_WEBHOOK_ACCEPTED_URL", required=False)
+            
+            # Test Webhook URLs (optional)
+            self.n8n_webhook_test_received_url = get_required_env_var("N8N_WEBHOOK_TEST_RECEIVED_URL", required=False)
+            self.n8n_webhook_test_accepted_url = get_required_env_var("N8N_WEBHOOK_TEST_ACCEPTED_URL", required=False)
+        except ValueError as e:
+            print(f"Configuration Error: {e}")
+            sys.exit(1)
         
         self.headers = {
             "Authorization": f"Bearer {self.api_token}",
             "Accept": "application/json"
         }
         
+        # Print configuration for debugging
         print(f"Using Telegram Group ID: {self.telegram_group_id}")
         print(f"N8N Received Webhook URL: {self.n8n_webhook_received_url}")
         print(f"N8N Accepted Webhook URL: {self.n8n_webhook_accepted_url}")
+        print(f"N8N Test Received Webhook URL: {self.n8n_webhook_test_received_url}")
+        print(f"N8N Test Accepted Webhook URL: {self.n8n_webhook_test_accepted_url}")
+
+    def is_valid_telegram_id(self, telegram_id):
+        """
+        Validate Telegram ID.
+        Telegram IDs are typically positive integers.
+        """
+        try:
+            # Convert to integer and check if it's a positive number
+            id_int = int(telegram_id)
+            return id_int > 0
+        except (ValueError, TypeError):
+            return False
 
     def get_records(self):
         """Fetch all records from the table"""
@@ -102,7 +176,7 @@ class TeablePoller:
             print(f"Failed to update record status: {str(e)}")
             return False
 
-    def call_webhook(self, webhook_url: str, payload: dict):
+    def call_webhook(self, webhook_url: str, payload: dict, is_test: bool = False):
         """Generic method to call a webhook"""
         try:
             response = requests.post(
@@ -111,10 +185,10 @@ class TeablePoller:
                 headers={"Content-Type": "application/json"}
             )
             response.raise_for_status()
-            print(f"Successfully called webhook: {webhook_url}")
+            print(f"Successfully called {'test ' if is_test else ''}webhook: {webhook_url}")
             return True
         except requests.exceptions.RequestException as e:
-            print(f"Error calling webhook {webhook_url}: {str(e)}")
+            print(f"Error calling {'test ' if is_test else ''}webhook {webhook_url}: {str(e)}")
             return False
 
     def get_approved_records(self, processed_storage):
@@ -129,7 +203,12 @@ class TeablePoller:
             telegram_username = fields.get("telegramUsername", "")
             record_id = record.get("id")
 
+            # Skip records with invalid Telegram IDs
             if status == "approved" and telegram_id:
+                if not self.is_valid_telegram_id(telegram_id):
+                    print(f"Skipping record {record_id} with invalid Telegram ID: {telegram_id}")
+                    continue
+
                 telegram_id = int(telegram_id)
                 if not processed_storage.is_processed(telegram_id, "added"):
                     approved_records.append({
@@ -152,7 +231,12 @@ class TeablePoller:
             telegram_username = fields.get("telegramUsername", "")
             record_id = record.get("id")
 
+            # Skip records with invalid Telegram IDs
             if status == "refused" and telegram_id:
+                if not self.is_valid_telegram_id(telegram_id):
+                    print(f"Skipping record {record_id} with invalid Telegram ID: {telegram_id}")
+                    continue
+
                 telegram_id = int(telegram_id)
                 if not processed_storage.is_processed(telegram_id, "removed"):
                     refused_records.append({
@@ -165,11 +249,23 @@ class TeablePoller:
 
 class TelegramGroupManager:
     def __init__(self):
-        # Get credentials from environment variables
-        self.api_id = int(os.getenv("TELEGRAM_API_ID"))
-        self.api_hash = os.getenv("TELEGRAM_API_HASH")
-        self.phone = os.getenv("TELEGRAM_PHONE")
-        self.group_id = int(os.getenv("TELGRAM_GROUP_ID"))
+        # Validate and retrieve Telegram configuration using safe conversion
+        try:
+            self.api_id = get_required_env_var(
+                "TELEGRAM_API_ID", 
+                convert_func=int, 
+                error_message="Invalid TELEGRAM_API_ID. Must be a valid integer."
+            )
+            self.api_hash = get_required_env_var("TELEGRAM_API_HASH")
+            self.phone = get_required_env_var("TELEGRAM_PHONE")
+            self.group_id = get_required_env_var(
+                "TELGRAM_GROUP_ID", 
+                convert_func=int, 
+                error_message="Invalid TELGRAM_GROUP_ID. Must be a valid integer."
+            )
+        except ValueError as e:
+            print(f"Telegram Configuration Error: {e}")
+            sys.exit(1)
         
         # Initialize client
         self.client = TelegramClient(self.phone, self.api_id, self.api_hash)
@@ -454,7 +550,7 @@ def main():
     poller = TeablePoller()
     manager = TelegramGroupManager()
     processed_storage = ProcessedIdsStorage()
-    poll_interval = int(os.getenv("POLL_INTERVAL_SECONDS", "5"))
+    poll_interval = int(get_required_env_var("POLL_INTERVAL_SECONDS", default="5"))
     
     print(f"""
 === Direct Telegram Group Addition/Removal Service Started ===
@@ -500,7 +596,15 @@ Telegram Group ID: {poller.telegram_group_id}
                                 "name": name
                             }
                             
-                            if poller.call_webhook(poller.n8n_webhook_received_url, webhook_payload):
+                            # Try test webhook first
+                            test_webhook_success = poller.n8n_webhook_test_received_url and poller.call_webhook(
+                                poller.n8n_webhook_test_received_url, 
+                                webhook_payload, 
+                                is_test=True
+                            )
+                            
+                            # If test webhook fails or doesn't exist, try main webhook
+                            if not test_webhook_success and poller.call_webhook(poller.n8n_webhook_received_url, webhook_payload):
                                 processed_storage.mark_as_processed(telegram_id, "webhook_received")
                                 poller.update_status([record_id], 'pending')
 
@@ -528,7 +632,15 @@ Telegram Group ID: {poller.telegram_group_id}
                                     "name": name
                                 }
                                 
-                                if poller.call_webhook(poller.n8n_webhook_accepted_url, webhook_payload):
+                                # Try test webhook first
+                                test_webhook_success = poller.n8n_webhook_test_accepted_url and poller.call_webhook(
+                                    poller.n8n_webhook_test_accepted_url, 
+                                    webhook_payload, 
+                                    is_test=True
+                                )
+                                
+                                # If test webhook fails or doesn't exist, try main webhook
+                                if not test_webhook_success and poller.call_webhook(poller.n8n_webhook_accepted_url, webhook_payload):
                                     processed_storage.mark_as_processed(telegram_id, "webhook_accepted")
 
                         if poller.update_status(successful_records, 'telegram'):
