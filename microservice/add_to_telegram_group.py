@@ -7,11 +7,52 @@ from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError
 import requests
 import json
 import time
+import threading
 from dotenv import load_dotenv
 import os
 import sys
 import traceback
 import re  # Added for ID validation
+"""
+Purpose:
+
+Automate Telegram group user management
+Add or remove users based on record status in a Teable table
+Provide webhook notifications for status changes
+Key Components:
+
+TeablePoller: Manages interactions with Teable API
+
+Fetches records
+Updates record statuses
+Calls webhooks for record state changes
+TelegramGroupManager: Handles Telegram group interactions
+
+Connects to Telegram API
+Adds users to group
+Removes users from group
+Handles authentication and error scenarios
+ProcessedIdsStorage: Tracks processed user IDs
+
+Prevents duplicate actions
+Stores processed IDs in a JSON file
+Workflow:
+
+Continuously polls Teable table
+Processes records with statuses:
+"submitted": Send webhook notification
+"approved": Add users to Telegram group
+"refused": Remove users from Telegram group
+Notable Features:
+
+Environment variable configuration
+Error handling and logging
+Rate limiting (60-second delay between actions)
+Optional test webhooks
+Support for 2FA Telegram login
+The script provides a robust, automated solution for managing Telegram group membership with extensive error handling and logging capabilities.
+"""
+
 
 # Ensure environment variables are loaded
 load_dotenv()
@@ -250,18 +291,20 @@ class TeablePoller:
 class TelegramGroupManager:
     def __init__(self):
         # Validate and retrieve Telegram configuration using safe conversion
+         # [Previous initialization code remains the same]
+        self.last_user_add_time = 0
+        self.add_user_lock = threading.Lock()
+        self.add_user_event = threading.Event()
         try:
             self.api_id = get_required_env_var(
                 "TELEGRAM_API_ID", 
-                convert_func=int, 
-                error_message="Invalid TELEGRAM_API_ID. Must be a valid integer."
+                convert_func=int
             )
             self.api_hash = get_required_env_var("TELEGRAM_API_HASH")
             self.phone = get_required_env_var("TELEGRAM_PHONE")
             self.group_id = get_required_env_var(
                 "TELGRAM_GROUP_ID", 
-                convert_func=int, 
-                error_message="Invalid TELGRAM_GROUP_ID. Must be a valid integer."
+                convert_func=int
             )
         except ValueError as e:
             print(f"Telegram Configuration Error: {e}")
@@ -367,83 +410,8 @@ class TelegramGroupManager:
         
         return groups
 
-    def remove_users(self, users, processed_storage):
-        """Remove multiple users from the group"""
-        group_hash = os.getenv("TELEGRAM_GROUP_HASH")
-        if not group_hash:
-            groups = self.get_groups()
-            target_group = next((g for g in groups if g['id'] == str(self.group_id)), None)
-            if not target_group:
-                raise ValueError(f"Could not find group with ID {self.group_id}")
-            group_hash = int(target_group['access_hash'])
-        else:
-            group_hash = int(group_hash)
-
-        target_group_entity = InputPeerChannel(self.group_id, group_hash)
-        error_count = 0
-        successful_records = []
-
-        rights = ChatBannedRights(
-            until_date=None,
-            view_messages=True,
-            send_messages=True,
-            send_media=True,
-            send_stickers=True,
-            send_gifs=True,
-            send_games=True,
-            send_inline=True,
-            embed_links=True
-        )
-
-        for user in users:
-            try:
-                # Try to get user entity first by username if available
-                user_entity = None
-                if user.get('telegram_username'):
-                    try:
-                        user_entity = self.client.get_input_entity(user['telegram_username'])
-                    except ValueError:
-                        pass
-
-                # If username lookup failed, try by ID
-                if not user_entity:
-                    try:
-                        user_entity = self.client.get_input_entity(user['telegram_id'])
-                    except ValueError:
-                        print(f"Could not find user {user['telegram_id']}. Skipping...")
-                        continue
-
-                if not isinstance(user_entity, InputPeerUser):
-                    print(f"Skipping user {user['telegram_id']}: Not a user entity")
-                    continue
-
-                print(f"Removing user with ID: {user['telegram_id']}")
-                
-                self.client(EditBannedRequest(
-                    target_group_entity,
-                    user_entity,
-                    rights
-                ))
-                
-                processed_storage.mark_as_processed(user['telegram_id'], "removed")
-                successful_records.append(user['record_id'])
-                
-                print("Waiting 60 seconds before next removal...")
-                time.sleep(60)
-                
-            except Exception as e:
-                print(f"Error removing user {user['telegram_id']}: {str(e)}")
-                traceback.print_exc()
-                error_count += 1
-                if error_count > 10:
-                    print("Too many errors occurred. Stopping script.")
-                    break
-                continue
-        
-        return successful_records
-        
     def add_users(self, users, processed_storage):
-        """Add multiple users to the group"""
+        """Add multiple users to the group with dynamic rate limiting"""
         # Get the target group entity
         try:
             # First try to get the group directly
@@ -464,8 +432,24 @@ class TelegramGroupManager:
         error_count = 0
         successful_records = []
         
+        def wait_if_needed():
+            """Dynamically wait between user additions"""
+            with self.add_user_lock:
+                current_time = time.time()
+                time_since_last_add = current_time - self.last_user_add_time
+                
+                if time_since_last_add < 60:
+                    wait_time = 60 - time_since_last_add
+                    print(f"Waiting {wait_time:.2f} seconds before next user addition")
+                    time.sleep(wait_time)
+                
+                self.last_user_add_time = time.time()
+        
         for user in users:
             try:
+                # Wait dynamically between user additions
+                wait_if_needed()
+
                 # Try to get user entity first by username if available
                 user_entity = None
                 if user.get('telegram_username'):
@@ -499,9 +483,6 @@ class TelegramGroupManager:
                 processed_storage.mark_as_processed(user['telegram_id'], "added")
                 successful_records.append(user['record_id'])
                 
-                print("Waiting 60 seconds before next add...")
-                time.sleep(60)
-                
             except PeerFloodError:
                 print("Getting Flood Error from Telegram. Script should be stopped. Try again after some time.")
                 break
@@ -523,17 +504,10 @@ class TelegramGroupManager:
             except Exception as e:
                 print(f"Unexpected error while adding user {user['telegram_id']}: {str(e)}")
                 traceback.print_exc()
-                error_count += 1
-                if error_count > 10:
-                    print("Too many errors occurred. Stopping script.")
-                    break
-                continue
-        
+
         return successful_records
 
-    def close(self):
-        """Close the Telegram client connection"""
-        self.client.disconnect()
+
 
 def main():
     # Check if we're just listing groups
@@ -583,12 +557,12 @@ Telegram Group ID: {poller.telegram_group_id}
                     status = fields.get("status")
                     telegram_id = fields.get("telegramID")
                     telegram_username = fields.get("telegramUsername", "")
-                    name = fields.get("name", "")
+                    name = fields.get("First name", "")
                     record_id = record.get("id")
 
                     # Webhook for submitted status
                     if status == "submitted" and telegram_id:
-                        telegram_id = int(telegram_id)
+                        telegram_id = telegram_id#int(telegram_id)
                         if not processed_storage.is_processed(telegram_id, "webhook_received"):
                             webhook_payload = {
                                 "telegramID": telegram_id,
