@@ -506,6 +506,9 @@ class TelegramGroupManager:
                 traceback.print_exc()
 
         return successful_records
+    
+    def close(self):
+        self.client.disconnect()
 
 
 
