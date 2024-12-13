@@ -284,7 +284,7 @@ export default defineComponent({
                 "LinkedIn": linkedinUrl,
                 "Referral Source": String(userStore.$state.referralSource),
                 "Questions answered": String(userStore.$state.questionsAndAnswers),
-                "status": "pending",
+                "status": "submitted",
                 "telegramID": telegramID,
                 "telegramUsername": telegramUsername  // Added telegramUsername field
               }
