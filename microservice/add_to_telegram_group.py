@@ -252,23 +252,17 @@ class TelegramGroupManager:
 
     def remove_users(self, users, processed_storage):
         """Remove multiple users from the group"""
-        # First get all dialogs to ensure we have access to the group
-        print("Getting dialogs to find the group...")
-        dialogs = self.client.get_dialogs()
-        target_group = None
-        
-        for dialog in dialogs:
-            if dialog.entity.id == self.group_id:
-                target_group = dialog.entity
-                print(f"Found group in dialogs: {target_group.title}")
-                break
-        
-        if not target_group:
-            raise ValueError(f"Could not find group with ID {self.group_id} in dialogs")
-        
-        target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
-        print(f"Successfully created group entity for: {target_group.title}")
+        group_hash = os.getenv("TELEGRAM_GROUP_HASH")
+        if not group_hash:
+            groups = self.get_groups()
+            target_group = next((g for g in groups if g['id'] == str(self.group_id)), None)
+            if not target_group:
+                raise ValueError(f"Could not find group with ID {self.group_id}")
+            group_hash = int(target_group['access_hash'])
+        else:
+            group_hash = int(group_hash)
 
+        target_group_entity = InputPeerChannel(self.group_id, group_hash)
         error_count = 0
         successful_records = []
 
@@ -333,22 +327,22 @@ class TelegramGroupManager:
         
     def add_users(self, users, processed_storage):
         """Add multiple users to the group"""
-        # First get all dialogs to ensure we have access to the group
-        print("Getting dialogs to find the group...")
-        dialogs = self.client.get_dialogs()
-        target_group = None
-        
-        for dialog in dialogs:
-            if dialog.entity.id == self.group_id:
-                target_group = dialog.entity
-                print(f"Found group in dialogs: {target_group.title}")
-                break
-        
-        if not target_group:
-            raise ValueError(f"Could not find group with ID {self.group_id} in dialogs")
-        
-        target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
-        print(f"Successfully created group entity for: {target_group.title}")
+        # Get the target group entity
+        try:
+            # First try to get the group directly
+            target_group = self.client.get_entity(self.group_id)
+            if not isinstance(target_group, Channel):
+                raise ValueError("Target is not a channel/group")
+            
+            print(f"Successfully found group: {target_group.title}")
+            target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
+        except Exception as e:
+            print(f"Error getting group entity directly: {str(e)}")
+            # Fallback to using stored hash
+            group_hash = os.getenv("TELEGRAM_GROUP_HASH")
+            if not group_hash:
+                raise ValueError("Could not find group and no access hash provided")
+            target_group_entity = InputPeerChannel(self.group_id, int(group_hash))
 
         error_count = 0
         successful_records = []
@@ -402,13 +396,9 @@ class TelegramGroupManager:
             except ChannelInvalidError:
                 print("Invalid channel error. Trying to refresh group entity...")
                 try:
-                    dialogs = self.client.get_dialogs()
-                    for dialog in dialogs:
-                        if dialog.entity.id == self.group_id:
-                            target_group = dialog.entity
-                            target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
-                            print("Successfully refreshed group entity")
-                            break
+                    target_group = self.client.get_entity(self.group_id)
+                    target_group_entity = InputPeerChannel(target_group.id, target_group.access_hash)
+                    print("Successfully refreshed group entity")
                     continue  # Retry the current user
                 except Exception as refresh_error:
                     print(f"Failed to refresh group entity: {str(refresh_error)}")
@@ -456,6 +446,13 @@ Telegram Group ID: {poller.telegram_group_id}
         # Connect to Telegram
         if not manager.connect():
             print("Failed to connect to Telegram. Please try again.")
+            return
+        
+        # If TELEGRAM_GROUP_HASH is not set, get it first
+        if not os.getenv("TELEGRAM_GROUP_HASH"):
+            print("\nTELEGRAM_GROUP_HASH not found in .env")
+            manager.get_groups()
+            print("\nPlease add the access hash to your .env file and restart the script.")
             return
         
         while True:
