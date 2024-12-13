@@ -36,6 +36,9 @@
           <button @click="handleSubmit" class="primary-button" :disabled="isSubmitting">
             {{ isSubmitting ? 'Uploading...' : 'Continue' }}
           </button>
+          <button @click="retakePhoto" class="secondary-button">
+            Retake Photo
+          </button>
         </div>
       </div>
 
@@ -58,6 +61,7 @@ import tg from '../telegram'
 const TABLE_ID = 'tbliWkyKE4dT2L9s1oM'
 const FIELD_ID = 'fldtPf6h96XFllw4sOM' // where the picture is stored
 const API_TOKEN = 'teable_accO8ibvH9yrZjyRH8C_xEua4r2Cre7YHIZMuO3s7tazZWJSUBOP+dO4uZqkV9k='
+const RECEIVED_WEBHOOK_URL = import.meta.env.VITE_RECEIVED_WEBHOOK_URL || 'https://n8n.simbacasa.com/webhook-test/app-received'
 
 export default defineComponent({
   name: 'Photo',
@@ -71,6 +75,51 @@ export default defineComponent({
     const error = ref('')
     const isSubmitting = ref(false)
     const isCameraReady = ref(false)
+
+    const sendReceivedWebhook = async (telegramID: string, name: string) => {
+      console.log('Sending received webhook with the following details:', {
+        url: RECEIVED_WEBHOOK_URL,
+        telegramID,
+        name
+      })
+
+      try {
+        const payload = {
+          telegramID,
+          name: `${userStore.$state.firstName} ${userStore.$state.lastName}`
+        }
+
+        console.log('Webhook payload:', JSON.stringify(payload, null, 2))
+
+        const response = await fetch(RECEIVED_WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        })
+
+        console.log('Webhook response status:', response.status)
+        
+        // TypeScript-friendly way to log headers
+        const headerObj: Record<string, string> = {}
+        response.headers.forEach((value, key) => {
+          headerObj[key] = value
+        })
+        console.log('Webhook response headers:', headerObj)
+
+        const responseText = await response.text()
+        console.log('Webhook response body:', responseText)
+
+        if (!response.ok) {
+          console.error('Failed to send received webhook', responseText)
+          throw new Error(`Webhook call failed with status ${response.status}: ${responseText}`)
+        }
+      } catch (err) {
+        console.error('Error sending received webhook:', err)
+        throw err  // Re-throw to allow caller to handle the error
+      }
+    }
 
     const onVideoLoaded = () => {
       console.log('Video element loaded')
@@ -253,6 +302,9 @@ export default defineComponent({
         const recordId = recordData.records[0].id
         console.log('Record created with ID:', recordId)
 
+        // Send received webhook
+        await sendReceivedWebhook(telegramID, `${userStore.$state.firstName} ${userStore.$state.lastName}`)
+
         // Convert base64 to blob
         console.log('Converting image to blob...')
         const response = await fetch(capturedImage.value)
@@ -426,5 +478,15 @@ export default defineComponent({
   color: var(--tg-theme-hint-color, #999999);
   text-align: center;
   margin-top: 8px;
+}
+
+.secondary-button {
+  margin-top: 10px;
+  background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  color: var(--tg-theme-text-color, #000);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 </style>
