@@ -43,29 +43,37 @@
   - Requests (HTTP interactions)
   - python-dotenv (Environment management)
 
-### 2. API Integrations
+### 2. Data and Automation Infrastructure
+- **Data Management**: 
+  - Self-hosted Teable instance
+  - Custom data tracking and management
+- **Workflow Automation**: 
+  - Self-hosted n8n automation tool
+  - Webhook-driven workflows
+
+### 3. API Integrations
 - **Primary APIs**:
   - Telegram API
-  - Teable API
-  - n8n Webhooks
+  - Teable API (Self-hosted)
+  - n8n Webhooks (Self-hosted)
 
-### 3. Authentication
+### 4. Authentication
 - **Security Mechanisms**:
   - API token-based authentication
   - Environment-based configuration
   - Telegram 2FA support
 
-### 4. Data Management
+### 5. Data Management
 - **Persistence**:
   - JSON-based tracking (`processed_ids.json`)
   - Environment variable configuration
 
-### 5. Architectural Patterns
+### 6. Architectural Patterns
 - Microservice architecture
 - Event-driven design
 - Configuration-driven workflow
 
-### 6. Deployment Considerations
+### 7. Deployment Considerations
 - Containerization ready
 - Serverless deployment potential
 - CI/CD compatible
@@ -74,3 +82,4 @@
 - Webhook-driven communication
 - Modular, loosely coupled design
 - Flexible configuration management
+- Self-hosted infrastructure for enhanced control and privacy
