@@ -190,31 +190,71 @@ class TeablePoller:
         """Fetch all records from the table"""
         url = f"{self.base_url}/table/{self.table_id}/record"
         try:
+            print(f"\nFetching records from: {url}")
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
-            return response.json().get("records", [])
+            records = response.json().get("records", [])
+            print(f"Fetched {len(records)} records from table")
+            if len(records) > 0:
+                print("Sample record fields:", records[0].get("fields", {}))
+            return records
         except requests.exceptions.RequestException as e:
             print(f"Error fetching records: {str(e)}")
             return []
 
+    def update_double_status(self, record_id: str, telegram_id: str):
+        """Update a record to double status and modify its telegramID"""
+        url = f"{self.base_url}/table/{self.table_id}/record"
+        payload = {
+            "fieldKeyType": "id",
+            "typecast": True,
+            "records": [{
+                "id": record_id,
+                "fields": {
+                    "fldE151819s5A2x1fnH": "double",  # status field
+                    "fldtDljIL5MBhcwoms4": f"double_{telegram_id}"  # telegramID field
+                }
+            }]
+        }
+        
+        try:
+            print(f"Sending PATCH request to update double status: {url}")
+            print(f"Payload: {json.dumps(payload, indent=2)}")
+            response = requests.patch(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            print(f"Updated record {record_id} to double status")
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to update record to double status: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Error response body: {e.response.text}")
+            return False
+
     def update_status(self, record_ids: list, new_status: str):
         """Update the status of multiple records"""
         url = f"{self.base_url}/table/{self.table_id}/record"
-        records = [{"id": record_id, "fields": {"status": new_status}} for record_id in record_ids]
+        records = [{"id": record_id, "fields": {"fldE151819s5A2x1fnH": new_status}} for record_id in record_ids]
         
         payload = {
-            "fieldKeyType": "name",
+            "fieldKeyType": "id",
             "typecast": True,
             "records": records
         }
         
         try:
+            print(f"Sending PATCH request to: {url}")
+            print(f"Headers: {self.headers}")
+            print(f"Payload: {json.dumps(payload, indent=2)}")
             response = requests.patch(url, headers=self.headers, json=payload)
+            print(f"Response status code: {response.status_code}")
+            print(f"Response body: {response.text}")
             response.raise_for_status()
             print(f"Updated status to '{new_status}' for records: {record_ids}")
             return True
         except requests.exceptions.RequestException as e:
             print(f"Failed to update record status: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Error response body: {e.response.text}")
             return False
 
     def call_webhook(self, webhook_url: str, payload: dict, is_test: bool = False):
@@ -251,12 +291,13 @@ class TeablePoller:
                     continue
 
                 telegram_id = int(telegram_id)
-                if not processed_storage.is_processed(telegram_id, "added"):
-                    approved_records.append({
-                        "telegram_id": telegram_id,
-                        "telegram_username": telegram_username,
-                        "record_id": record_id
-                    })
+                # Commented out processed records check
+                #if not processed_storage.is_processed(telegram_id, "added"):
+                approved_records.append({
+                    "telegram_id": telegram_id,
+                    "telegram_username": telegram_username,
+                    "record_id": record_id
+                })
 
         return approved_records
 
@@ -279,12 +320,13 @@ class TeablePoller:
                     continue
 
                 telegram_id = int(telegram_id)
-                if not processed_storage.is_processed(telegram_id, "removed"):
-                    refused_records.append({
-                        "telegram_id": telegram_id,
-                        "telegram_username": telegram_username,
-                        "record_id": record_id
-                    })
+                # Commented out processed records check
+                #if not processed_storage.is_processed(telegram_id, "removed"):
+                refused_records.append({
+                    "telegram_id": telegram_id,
+                    "telegram_username": telegram_username,
+                    "record_id": record_id
+                })
 
         return refused_records
 
@@ -480,15 +522,15 @@ class TelegramGroupManager:
                     users=[user_entity]
                 ))
                 
-                processed_storage.mark_as_processed(user['telegram_id'], "added")
+                #processed_storage.mark_as_processed(user['telegram_id'], "added")
                 successful_records.append(user['record_id'])
                 
             except PeerFloodError:
                 print("Getting Flood Error from Telegram. Script should be stopped. Try again after some time.")
                 break
             except UserPrivacyRestrictedError:
-                print(f"The user {user['telegram_id']} privacy settings do not allow you to add them. Marking as processed.")
-                processed_storage.mark_as_processed(user['telegram_id'], "added")
+                print(f"The user {user['telegram_id']} privacy settings do not allow you to add them.")
+                #processed_storage.mark_as_processed(user['telegram_id'], "added")
                 successful_records.append(user['record_id'])
                 continue
             except ChannelInvalidError:
@@ -555,6 +597,7 @@ Telegram Group ID: {poller.telegram_group_id}
                 records = poller.get_records()
                 
                 # Process records
+                print("\nChecking records...")
                 for record in records:
                     fields = record.get("fields", {})
                     status = fields.get("status")
@@ -562,28 +605,68 @@ Telegram Group ID: {poller.telegram_group_id}
                     telegram_username = fields.get("telegramUsername", "")
                     name = fields.get("First name", "")
                     record_id = record.get("id")
+                    
+                    print(f"Processing record: ID={record_id}, Status={status}, TelegramID={telegram_id}")
 
                     # Webhook for submitted status
                     if status == "submitted" and telegram_id:
-                        telegram_id = telegram_id#int(telegram_id)
-                        if not processed_storage.is_processed(telegram_id, "webhook_received"):
-                            webhook_payload = {
-                                "telegramID": telegram_id,
-                                "telegramUsername": telegram_username,
-                                "name": name
-                            }
-                            
-                            # Try test webhook first
-                            test_webhook_success = poller.n8n_webhook_test_received_url and poller.call_webhook(
+                        print(f"\nFound submitted record with ID {record_id}")
+                        
+                        # Check for existing records with the same telegramID
+                        print(f"\nChecking for existing records with telegramID: {telegram_id}")
+                        existing_record = None
+                        for r in records:
+                            r_fields = r.get("fields", {})
+                            r_status = r_fields.get("status")
+                            r_telegram_id = r_fields.get("telegramID")
+                            print(f"Checking record {r['id']}: status={r_status}, telegramID={r_telegram_id}")
+                            if r_telegram_id == telegram_id and r["id"] != record_id and r_status == "telegram":
+                                existing_record = r
+                                print(f"Found matching record with telegram status!")
+                                break
+                        
+                        if existing_record:
+                            print(f"Found existing record with same telegramID: {existing_record['id']}")
+                            # Update current record to double status and modify telegramID
+                            poller.update_double_status(record_id, telegram_id)
+                            continue
+                        
+                        # If no existing record found, proceed with normal webhook flow
+                        print(f"Processing webhook for record {record_id}")
+                        webhook_payload = {
+                            "telegramID": telegram_id,
+                            "telegramUsername": telegram_username,
+                            "name": name
+                        }
+                        print(f"Webhook payload prepared: {webhook_payload}")
+                        
+                        # Try test webhook first
+                        if poller.n8n_webhook_test_received_url:
+                            print(f"Attempting test webhook: {poller.n8n_webhook_test_received_url}")
+                            test_webhook_success = poller.call_webhook(
                                 poller.n8n_webhook_test_received_url, 
                                 webhook_payload, 
                                 is_test=True
                             )
-                            
-                            # If test webhook fails or doesn't exist, try main webhook
-                            if not test_webhook_success and poller.call_webhook(poller.n8n_webhook_received_url, webhook_payload):
-                                processed_storage.mark_as_processed(telegram_id, "webhook_received")
-                                poller.update_status([record_id], 'pending')
+                        else:
+                            print("No test webhook URL configured")
+                            test_webhook_success = False
+                        
+                        # If test webhook fails or doesn't exist, try main webhook
+                        if not test_webhook_success:
+                            if poller.n8n_webhook_received_url:
+                                print(f"Attempting main webhook: {poller.n8n_webhook_received_url}")
+                                if poller.call_webhook(poller.n8n_webhook_received_url, webhook_payload):
+                                    print(f"Main webhook successful for record {record_id}")
+                                    #processed_storage.mark_as_processed(telegram_id, "webhook_received")
+                                    print(f"Updating status to pending for record {record_id}")
+                                    poller.update_status([record_id], 'pending')
+                                else:
+                                    print(f"Main webhook failed for record {record_id}")
+                            else:
+                                print("No main webhook URL configured")
+                        #else:
+                        #    print(f"Record {record_id} already processed for webhook")
 
                 # Handle approved records
                 approved_records = poller.get_approved_records(processed_storage)
@@ -618,7 +701,8 @@ Telegram Group ID: {poller.telegram_group_id}
                                 
                                 # If test webhook fails or doesn't exist, try main webhook
                                 if not test_webhook_success and poller.call_webhook(poller.n8n_webhook_accepted_url, webhook_payload):
-                                    processed_storage.mark_as_processed(telegram_id, "webhook_accepted")
+                                    #processed_storage.mark_as_processed(telegram_id, "webhook_accepted")
+                                    pass  # Added to maintain proper indentation
 
                         if poller.update_status(successful_records, 'telegram'):
                             print(f"Successfully processed {len(successful_records)} approved records")
