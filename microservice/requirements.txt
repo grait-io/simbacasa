@@ -1,3 +1,11 @@
+# HTTP requests library
 requests>=2.31.0
+
+# Environment variables management
 python-dotenv>=1.0.0
+
+# Telegram client library
 Telethon>=1.31.1
+
+# Other dependencies
+typing-extensions>=4.5.0  # Required by Telethon

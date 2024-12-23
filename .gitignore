@@ -31,6 +31,10 @@ src/telegram.js
 
 # Environment variables
 .env
+
+# Logs directory
+microservice/logs/*
+!microservice/logs/.gitkeep
 *.vue.js.mapmicroservice/.env
 microservice/+4917623897107.session
 microservice/+4917623897107.session
