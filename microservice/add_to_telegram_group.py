@@ -183,28 +183,30 @@ class TeablePoller:
     def get_records_with_filter(self, status, check_username=False):
         """Fetch records with specific status and optionally check for telegramUsername"""
         url = f"{self.base_url}/table/{self.table_id}/record"
-        filter_condition = {
-            "conjunction": "and",
-            "filterSet": [
-                {
+        filter_params = {
+            "fieldKeyType": "id",
+            "filter": json.dumps({
+                "conjunction": "and",
+                "filterSet": [{
                     "fieldId": "fldE151819s5A2x1fnH",
                     "operator": "is",
                     "value": status
-                }
-            ]
-        }
-        
-        filter_params = {
-            "viewId": "viwzfxDDRz55gCffqHy",
-            "fieldKeyType": "id",
-            "filter": json.dumps(filter_condition)
+                }]
+            })
         }
         try:
             logger.debug(f"Fetching {status} records from: {url}")
             logger.debug(f"Filter params: {json.dumps(filter_params)}")
             response = requests.get(url, headers=self.headers, params=filter_params)
             response.raise_for_status()
-            records = response.json().get("records", [])
+            response_data = response.json()
+            logger.debug(f"API Response: {json.dumps(response_data)}")
+            records = response_data.get("records", [])
+            
+            # Log the actual status values we're getting back
+            if records:
+                statuses = [r.get("fields", {}).get("fldE151819s5A2x1fnH") for r in records]
+                logger.debug(f"Status values in response: {statuses}")
             
             if check_username:
                 # Filter records that have telegram username field
