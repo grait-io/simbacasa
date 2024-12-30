@@ -497,7 +497,6 @@ class TelegramGroupManager:
                             logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
                             # Update status to invited
                             poller.update_status([user['record_id']], 'invited')
-                            successful_records.append(user['record_id'])
                             continue
                         except Exception as webhook_error:
                             logger.warning(f"Test invite webhook failed: {str(webhook_error)}, falling back to production webhook")
@@ -511,8 +510,10 @@ class TelegramGroupManager:
                             response.raise_for_status()
                             logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
                             # Update status to invited
-                            poller.update_status([user['record_id']], 'invited')
-                            successful_records.append(user['record_id'])
+                            if poller.update_status([user['record_id']], 'invited'):
+                                logger.info(f"Successfully updated status to 'invited' for user {user['telegram_id']}")
+                            else:
+                                logger.error(f"Failed to update status to 'invited' for user {user['telegram_id']}")
                         except Exception as webhook_error:
                             logger.error(f"Production invite webhook failed: {str(webhook_error)}")
                             # Check if it's a 500 error
@@ -564,7 +565,6 @@ class TelegramGroupManager:
                         logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
                         # Update status to invited
                         poller.update_status([user['record_id']], 'invited')
-                        successful_records.append(user['record_id'])
                         continue
                     except Exception as webhook_error:
                         logger.warning(f"Test invite webhook failed: {str(webhook_error)}, falling back to production webhook")
@@ -578,7 +578,10 @@ class TelegramGroupManager:
                         response.raise_for_status()
                         logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
                         # Update status to invited
-                        poller.update_status([user['record_id']], 'invited')
+                        if poller.update_status([user['record_id']], 'invited'):
+                            logger.info(f"Successfully updated status to 'invited' for user {user['telegram_id']}")
+                        else:
+                            logger.error(f"Failed to update status to 'invited' for user {user['telegram_id']}")
                     except Exception as webhook_error:
                         logger.error(f"Production invite webhook failed: {str(webhook_error)}")
                         # Check if it's a 500 error
@@ -586,7 +589,6 @@ class TelegramGroupManager:
                             logger.info(f"Server returned 500 error, updating status to blocked for user {user['telegram_id']}")
                             poller.update_status([user['record_id']], 'blocked')
                         
-                successful_records.append(user['record_id'])
                 continue
             except ChannelInvalidError:
                 logger.error("Invalid channel error. Attempting to refresh group entity...")
@@ -617,7 +619,6 @@ class TelegramGroupManager:
                         logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
                         # Update status to invited
                         poller.update_status([user['record_id']], 'invited')
-                        successful_records.append(user['record_id'])
                         continue
                     except Exception as webhook_error:
                         logger.warning(f"Test invite webhook failed: {str(webhook_error)}, falling back to production webhook")
@@ -631,7 +632,10 @@ class TelegramGroupManager:
                         response.raise_for_status()
                         logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
                         # Update status to invited
-                        poller.update_status([user['record_id']], 'invited')
+                        if poller.update_status([user['record_id']], 'invited'):
+                            logger.info(f"Successfully updated status to 'invited' for user {user['telegram_id']}")
+                        else:
+                            logger.error(f"Failed to update status to 'invited' for user {user['telegram_id']}")
                     except Exception as webhook_error:
                         logger.error(f"Production invite webhook failed: {str(webhook_error)}")
                         # Check if it's a 500 error
@@ -639,7 +643,6 @@ class TelegramGroupManager:
                             logger.info(f"Server returned 500 error, updating status to blocked for user {user['telegram_id']}")
                             poller.update_status([user['record_id']], 'blocked')
                         
-                successful_records.append(user['record_id'])
                 continue
             except Exception as e:
                 logger.error(f"Unexpected error while adding user {user['telegram_id']}: {str(e)}")
