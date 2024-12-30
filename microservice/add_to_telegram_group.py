@@ -183,11 +183,21 @@ class TeablePoller:
     def get_records_with_filter(self, status, check_username=False):
         """Fetch records with specific status and optionally check for telegramUsername"""
         url = f"{self.base_url}/table/{self.table_id}/record"
-        # Use list of tuples to allow multiple search parameters
-        # Use view filter to get records by status
+        filter_condition = {
+            "conjunction": "and",
+            "filterSet": [
+                {
+                    "fieldId": "fldE151819s5A2x1fnH",
+                    "operator": "is",
+                    "value": status
+                }
+            ]
+        }
+        
         filter_params = {
-            "viewId": "viwzfxDDRz55gCffqHy",  # Replace with your view ID that filters by status
-            "fieldKeyType": "id"
+            "viewId": "viwzfxDDRz55gCffqHy",
+            "fieldKeyType": "id",
+            "filter": json.dumps(filter_condition)
         }
         try:
             logger.debug(f"Fetching {status} records from: {url}")
@@ -195,9 +205,6 @@ class TeablePoller:
             response = requests.get(url, headers=self.headers, params=filter_params)
             response.raise_for_status()
             records = response.json().get("records", [])
-            
-            # Filter records by status
-            records = [r for r in records if r.get("fields", {}).get("fldE151819s5A2x1fnH") == status]
             
             if check_username:
                 # Filter records that have telegram username field
@@ -433,7 +440,7 @@ class TelegramGroupManager:
         
         return groups
 
-    def add_users(self, users, processed_storage):
+    def add_users(self, users, processed_storage, poller):
         """Add multiple users to the group"""
         logger.info(f"Adding {len(users)} users to group")
         try:
@@ -519,6 +526,8 @@ class TelegramGroupManager:
                         response = requests.post(test_webhook_url, json=webhook_payload)
                         response.raise_for_status()
                         logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
+                        # Update status to invited
+                        poller.update_status([user['record_id']], 'invited')
                         successful_records.append(user['record_id'])
                         continue
                     except Exception as webhook_error:
@@ -532,9 +541,15 @@ class TelegramGroupManager:
                         response = requests.post(prod_webhook_url, json=webhook_payload)
                         response.raise_for_status()
                         logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
+                        # Update status to invited
+                        poller.update_status([user['record_id']], 'invited')
                     except Exception as webhook_error:
                         logger.error(f"Production invite webhook failed: {str(webhook_error)}")
-                
+                        # Check if it's a 500 error
+                        if hasattr(webhook_error, 'response') and webhook_error.response.status_code == 500:
+                            logger.info(f"Server returned 500 error, updating status to blocked for user {user['telegram_id']}")
+                            poller.update_status([user['record_id']], 'blocked')
+                        
                 successful_records.append(user['record_id'])
                 continue
             except ChannelInvalidError:
@@ -564,6 +579,8 @@ class TelegramGroupManager:
                         response = requests.post(test_webhook_url, json=webhook_payload)
                         response.raise_for_status()
                         logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
+                        # Update status to invited
+                        poller.update_status([user['record_id']], 'invited')
                         successful_records.append(user['record_id'])
                         continue
                     except Exception as webhook_error:
@@ -577,9 +594,15 @@ class TelegramGroupManager:
                         response = requests.post(prod_webhook_url, json=webhook_payload)
                         response.raise_for_status()
                         logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
+                        # Update status to invited
+                        poller.update_status([user['record_id']], 'invited')
                     except Exception as webhook_error:
                         logger.error(f"Production invite webhook failed: {str(webhook_error)}")
-                
+                        # Check if it's a 500 error
+                        if hasattr(webhook_error, 'response') and webhook_error.response.status_code == 500:
+                            logger.info(f"Server returned 500 error, updating status to blocked for user {user['telegram_id']}")
+                            poller.update_status([user['record_id']], 'blocked')
+                        
                 successful_records.append(user['record_id'])
                 continue
             except Exception as e:
@@ -705,7 +728,7 @@ Telegram Group ID: {poller.telegram_group_id}
                 approved_records = poller.get_approved_records(processed_storage)
                 if approved_records:
                     logger.info(f"Processing {len(approved_records)} approved records")
-                    successful_records = manager.add_users(approved_records, processed_storage)
+                    successful_records = manager.add_users(approved_records, processed_storage, poller)
                     
                     if successful_records:
                         for record_id in successful_records:
