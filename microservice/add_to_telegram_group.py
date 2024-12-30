@@ -2,7 +2,7 @@ from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import InviteToChannelRequest, EditBannedRequest
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty, InputPeerUser, InputPeerChannel, ChatBannedRights, Channel
-from telethon.errors.rpcerrorlist import PeerFloodError, UserPrivacyRestrictedError, ChannelInvalidError
+from telethon.errors.rpcerrorlist import PeerFloodError, UserPrivacyRestrictedError, ChannelInvalidError, UserNotMutualContactError
 from telethon.errors import SessionPasswordNeededError, PhoneCodeInvalidError
 import requests
 import json
@@ -504,6 +504,37 @@ class TelegramGroupManager:
                 break
             except UserPrivacyRestrictedError:
                 logger.warning(f"User {user['telegram_id']} has privacy restrictions")
+                
+                # Call webhook for users with privacy restrictions
+                webhook_payload = {
+                    "telegramID": user['telegram_id'],
+                    "telegramUsername": user.get('telegram_username', '')
+                }
+
+                # Try test webhook first
+                test_webhook_url = os.getenv("N8N_WEBHOOK_INVITE_TEST_URL")
+                if test_webhook_url:
+                    try:
+                        logger.info(f"Calling test invite webhook for user {user['telegram_id']}")
+                        response = requests.post(test_webhook_url, json=webhook_payload)
+                        response.raise_for_status()
+                        logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
+                        successful_records.append(user['record_id'])
+                        continue
+                    except Exception as webhook_error:
+                        logger.warning(f"Test invite webhook failed: {str(webhook_error)}, falling back to production webhook")
+
+                # Fall back to production webhook if test webhook failed or doesn't exist
+                prod_webhook_url = os.getenv("N8N_WEBHOOK_INVITE_URL")
+                if prod_webhook_url:
+                    try:
+                        logger.info(f"Calling production invite webhook for user {user['telegram_id']}")
+                        response = requests.post(prod_webhook_url, json=webhook_payload)
+                        response.raise_for_status()
+                        logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
+                    except Exception as webhook_error:
+                        logger.error(f"Production invite webhook failed: {str(webhook_error)}")
+                
                 successful_records.append(user['record_id'])
                 continue
             except ChannelInvalidError:
@@ -516,6 +547,41 @@ class TelegramGroupManager:
                 except Exception as refresh_error:
                     logger.error(f"Failed to refresh group entity: {str(refresh_error)}")
                     break
+            except UserNotMutualContactError:
+                logger.warning(f"User {user['telegram_id']} is not a mutual contact")
+                
+                # Call webhook for users who are not mutual contacts
+                webhook_payload = {
+                    "telegramID": user['telegram_id'],
+                    "telegramUsername": user.get('telegram_username', '')
+                }
+
+                # Try test webhook first
+                test_webhook_url = os.getenv("N8N_WEBHOOK_INVITE_TEST_URL")
+                if test_webhook_url:
+                    try:
+                        logger.info(f"Calling test invite webhook for user {user['telegram_id']}")
+                        response = requests.post(test_webhook_url, json=webhook_payload)
+                        response.raise_for_status()
+                        logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
+                        successful_records.append(user['record_id'])
+                        continue
+                    except Exception as webhook_error:
+                        logger.warning(f"Test invite webhook failed: {str(webhook_error)}, falling back to production webhook")
+
+                # Fall back to production webhook if test webhook failed or doesn't exist
+                prod_webhook_url = os.getenv("N8N_WEBHOOK_INVITE_URL")
+                if prod_webhook_url:
+                    try:
+                        logger.info(f"Calling production invite webhook for user {user['telegram_id']}")
+                        response = requests.post(prod_webhook_url, json=webhook_payload)
+                        response.raise_for_status()
+                        logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
+                    except Exception as webhook_error:
+                        logger.error(f"Production invite webhook failed: {str(webhook_error)}")
+                
+                successful_records.append(user['record_id'])
+                continue
             except Exception as e:
                 logger.error(f"Unexpected error while adding user {user['telegram_id']}: {str(e)}")
                 logger.error(traceback.format_exc())
