@@ -479,20 +479,54 @@ class TelegramGroupManager:
                 wait_if_needed()
 
                 user_entity = None
-                if user.get('telegram_username'):
-                    try:
-                        logger.debug(f"Trying to add user by username: {user['telegram_username']}")
-                        user_entity = self.client.get_input_entity(user['telegram_username'])
-                    except ValueError as e:
-                        logger.warning(f"Could not find user by username: {str(e)}")
+                # Only try to add users who have a username
+                if not user.get('telegram_username'):
+                    logger.info(f"User {user['telegram_id']} has no username, sending to webhook flow")
+                    webhook_payload = {
+                        "telegramID": user['telegram_id'],
+                        "telegramUsername": ""
+                    }
 
-                if not user_entity:
-                    try:
-                        logger.debug(f"Trying to add user by ID: {user['telegram_id']}")
-                        user_entity = self.client.get_input_entity(user['telegram_id'])
-                    except ValueError as e:
-                        logger.error(f"Could not find user by ID: {str(e)}")
-                        continue
+                    # Try test webhook first
+                    test_webhook_url = os.getenv("N8N_WEBHOOK_INVITE_TEST_URL")
+                    if test_webhook_url:
+                        try:
+                            logger.info(f"Calling test invite webhook for user {user['telegram_id']}")
+                            response = requests.post(test_webhook_url, json=webhook_payload)
+                            response.raise_for_status()
+                            logger.info(f"Successfully called test invite webhook for user {user['telegram_id']}")
+                            # Update status to invited
+                            poller.update_status([user['record_id']], 'invited')
+                            successful_records.append(user['record_id'])
+                            continue
+                        except Exception as webhook_error:
+                            logger.warning(f"Test invite webhook failed: {str(webhook_error)}, falling back to production webhook")
+
+                    # Fall back to production webhook
+                    prod_webhook_url = os.getenv("N8N_WEBHOOK_INVITE_URL")
+                    if prod_webhook_url:
+                        try:
+                            logger.info(f"Calling production invite webhook for user {user['telegram_id']}")
+                            response = requests.post(prod_webhook_url, json=webhook_payload)
+                            response.raise_for_status()
+                            logger.info(f"Successfully called production invite webhook for user {user['telegram_id']}")
+                            # Update status to invited
+                            poller.update_status([user['record_id']], 'invited')
+                            successful_records.append(user['record_id'])
+                        except Exception as webhook_error:
+                            logger.error(f"Production invite webhook failed: {str(webhook_error)}")
+                            # Check if it's a 500 error
+                            if hasattr(webhook_error, 'response') and webhook_error.response.status_code == 500:
+                                logger.info(f"Server returned 500 error, updating status to blocked for user {user['telegram_id']}")
+                                poller.update_status([user['record_id']], 'blocked')
+                    continue
+
+                try:
+                    logger.debug(f"Trying to add user by username: {user['telegram_username']}")
+                    user_entity = self.client.get_input_entity(user['telegram_username'])
+                except ValueError as e:
+                    logger.warning(f"Could not find user by username: {str(e)}")
+                    continue
 
                 if not isinstance(user_entity, InputPeerUser):
                     logger.warning(f"Skipping user {user['telegram_id']}: Not a user entity")
