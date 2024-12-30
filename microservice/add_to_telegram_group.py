@@ -180,19 +180,12 @@ class TeablePoller:
             logger.warning(f"Invalid Telegram ID format: {telegram_id}")
             return False
 
-    def get_records_with_filter(self, status, check_username=False):
-        """Fetch records with specific status and optionally check for telegramUsername"""
+    def get_records_with_filter(self, status):
+        """Fetch records with specific status"""
         url = f"{self.base_url}/table/{self.table_id}/record"
         filter_params = {
             "fieldKeyType": "id",
-            "filter": json.dumps({
-                "conjunction": "and",
-                "filterSet": [{
-                    "fieldId": "fldE151819s5A2x1fnH",
-                    "operator": "is",
-                    "value": status
-                }]
-            })
+            "filter": json.dumps({"conjunction":"and","filterSet":[{"fieldId":"fldE151819s5A2x1fnH","operator":"is","value":status}]})
         }
         try:
             logger.debug(f"Fetching {status} records from: {url}")
@@ -208,11 +201,9 @@ class TeablePoller:
                 statuses = [r.get("fields", {}).get("fldE151819s5A2x1fnH") for r in records]
                 logger.debug(f"Status values in response: {statuses}")
             
-            if check_username:
-                # Filter records that have telegram username field
-                records = [r for r in records if r.get("fields", {}).get("fldt5LbTEuUWxq7iboV")]
+            total_records = len(records)
+            logger.info(f"Fetched {total_records} {status} records")
             
-            logger.info(f"Fetched {len(records)} {status} records")
             if len(records) > 0:
                 logger.debug(f"Sample record fields: {records[0].get('fields', {})}")
             return records
@@ -293,31 +284,40 @@ class TeablePoller:
     def get_approved_records(self, processed_storage):
         """Get approved records that need processing"""
         # Get approved records and check for telegram username
-        records = self.get_records_with_filter("approved", check_username=True)
+        records = self.get_records_with_filter("approved")
         approved_records = []
 
+        logger.debug(f"Processing {len(records)} approved records")
         for record in records:
             fields = record.get("fields", {})
             telegram_id = fields.get("fldtDljIL5MBhcwoms4")  # This is the actual field name from Teable
             telegram_username = fields.get("fldt5LbTEuUWxq7iboV", "")  # This appears to be the username field
             record_id = record.get("id")
 
-            if telegram_id and self.is_valid_telegram_id(telegram_id):
-                telegram_id = int(telegram_id)
-                approved_records.append({
-                    "telegram_id": telegram_id,
-                    "telegram_username": telegram_username,
-                    "record_id": record_id
-                })
+            logger.debug(f"Processing approved record {record_id} with telegram_id: {telegram_id}, username: {telegram_username}")
+            if telegram_id:
+                try:
+                    telegram_id = int(telegram_id)
+                    if telegram_id > 0:
+                        approved_records.append({
+                            "telegram_id": telegram_id,
+                            "telegram_username": telegram_username,  # Keep this for the webhook payload
+                            "record_id": record_id
+                        })
+                        logger.debug(f"Added record {record_id} to approved records with telegram_id: {telegram_id}")
+                    else:
+                        logger.warning(f"Skipping record {record_id} with non-positive Telegram ID: {telegram_id}")
+                except (ValueError, TypeError):
+                    logger.warning(f"Skipping record {record_id} with invalid Telegram ID format: {telegram_id}")
             else:
-                logger.warning(f"Skipping record {record_id} with invalid Telegram ID: {telegram_id}")
+                logger.warning(f"Skipping record {record_id} with missing Telegram ID")
 
         logger.info(f"Found {len(approved_records)} approved records to process")
         return approved_records
 
     def get_refused_records(self, processed_storage):
         """Get refused records that need processing"""
-        records = self.get_records_with_filter("refused")
+        records = self.get_records_with_filter("refused")  # Get all refused records
         refused_records = []
 
         for record in records:
@@ -655,7 +655,7 @@ Telegram Group ID: {poller.telegram_group_id}
         while True:
             try:
                 # Get submitted records using filter
-                submitted_records = poller.get_records_with_filter("submitted")
+                submitted_records = poller.get_records_with_filter("submitted")  # Get all submitted records
                 for record in submitted_records:
                     fields = record.get("fields", {})
                     telegram_id = fields.get("fldtDljIL5MBhcwoms4")  # This is the actual field name from Teable
@@ -670,7 +670,7 @@ Telegram Group ID: {poller.telegram_group_id}
                         logger.info(f"Processing submitted record {record_id}")
                         
                         # Check for existing record with same Telegram ID
-                        existing_records = poller.get_records_with_filter("telegram")
+                        existing_records = poller.get_records_with_filter("telegram")  # Get all telegram records
                         logger.debug(f"Checking for duplicates of Telegram ID {telegram_id} among {len(existing_records)} existing records")
                         
                         existing_record = None
