@@ -278,7 +278,7 @@ class TeablePoller:
             logger.debug(f"Webhook response: {response.text}")
             return True
         except requests.exceptions.RequestException as e:
-            logger.error(f"Error calling {'test ' if is_test else ''}webhook: {str(e)}")
+            logger.warning(f"Error calling {'test ' if is_test else ''}webhook: {str(e)}")
             return False
 
     def get_approved_records(self, processed_storage):
